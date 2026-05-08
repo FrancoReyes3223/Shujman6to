@@ -36,7 +36,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
+      const res = await fetch("http://localhost:3001/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -50,7 +50,7 @@ export default function LoginPage() {
       }
 
       // Guardar token en cookie
-      document.cookie = `token=${data.access_token}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
+      document.cookie = `token=${data.data.token}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
       router.push("/dashboard");
     } catch {
       setGeneralError("No se pudo conectar con el servidor");
