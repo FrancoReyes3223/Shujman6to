@@ -2,15 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { API_BASE } from "../../lib/api";
-
-function getCookie(name: string) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift();
-}
+import { useTranslation } from "react-i18next";
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
 
@@ -47,18 +42,18 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-container">
-      <h1>Pagina principal</h1>
+      <h1>{t("dashboard_title", "Home")}</h1>
       {user ? (
-        <p>¡Bienvenido, <span className="font-bold text-white">{user.fullName}</span>! Has iniciado sesión correctamente.</p>
+        <p>{t("welcome_message", "Welcome, {{name}}! You have successfully signed in.", { name: user.fullName })}</p>
       ) : (
-        <p>Cargando perfil...</p>
+        <p>{t("loading_profile", "Loading profile...")}</p>
       )}
       {/* TODO: reemplazar '/docs/es' por `/docs/${i18n.language}` cuando se mergee la branch i18n */}
       <a className="btn-docs" href="/docs/es/">
         Documentación
       </a>
       <button className="btn-logout" onClick={handleLogout}>
-        Cerrar sesión
+        {t("logout", "Log out")}
       </button>
     </div>
   );

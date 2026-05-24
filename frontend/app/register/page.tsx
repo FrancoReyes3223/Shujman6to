@@ -3,9 +3,10 @@
 import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { API_BASE } from "../../lib/api";
+import { useTranslation } from "react-i18next";
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,25 +24,25 @@ export default function RegisterPage() {
   function validate() {
     const newErrors: typeof errors = {};
 
-    if (!fullName.trim()) newErrors.fullName = "El nombre es obligatorio";
+    if (!fullName.trim()) newErrors.fullName = t("name_required", "Name is required");
 
     if (!email.trim()) {
-      newErrors.email = "El email es obligatorio";
+      newErrors.email = t("email_required", "Email is required");
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) newErrors.email = "Ingresá un email válido";
+      if (!emailRegex.test(email)) newErrors.email = t("invalid_email", "Please enter a valid email");
     }
 
     if (!password) {
-      newErrors.password = "La contraseña es obligatoria";
+      newErrors.password = t("password_required", "Password is required");
     } else if (password.length < 6) {
-      newErrors.password = "Mínimo 6 caracteres";
+      newErrors.password = t("password_min_length", "Minimum 6 characters");
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = "Confirmá tu contraseña";
+      newErrors.confirmPassword = t("confirm_password_required", "Please confirm your password");
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Las contraseñas no coinciden";
+      newErrors.confirmPassword = t("passwords_dont_match", "Passwords don't match");
     }
 
     return newErrors;
@@ -67,13 +68,13 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setGeneralError(data.message || "Error al registrar usuario");
+        setGeneralError(data.message || t("registration_error", "Error registering user"));
         return;
       }
 
       router.push("/?registered=true");
     } catch {
-      setGeneralError("No se pudo conectar con el servidor");
+      setGeneralError(t("server_connection_error", "Could not connect to the server"));
     } finally {
       setLoading(false);
     }
@@ -82,20 +83,20 @@ export default function RegisterPage() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>Crear Cuenta</h1>
-        <p className="subtitle">Completá tus datos para registrarte</p>
+        <h1>{t("create_account", "Create Account")}</h1>
+        <p className="subtitle">{t("register_subtitle", "Fill in your details to register")}</p>
 
         {generalError && <div className="error-banner">{generalError}</div>}
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
-            <label htmlFor="fullName">Nombre completo</label>
+            <label htmlFor="fullName">{t("full_name_label", "Full name")}</label>
             <div className="input-wrapper">
               <input
                 id="fullName"
                 type="text"
                 className={`form-input ${errors.fullName ? "error" : ""}`}
-                placeholder="Tu nombre"
+                placeholder={t("placeholder_full_name", "Your name")}
                 value={fullName}
                 onChange={(e) => {
                   setFullName(e.target.value);
@@ -108,13 +109,13 @@ export default function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t("email_label", "Email")}</label>
             <div className="input-wrapper">
               <input
                 id="email"
                 type="email"
                 className={`form-input ${errors.email ? "error" : ""}`}
-                placeholder="tu@email.com"
+                placeholder={t("placeholder_email", "your@email.com")}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -127,13 +128,13 @@ export default function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
+            <label htmlFor="password">{t("password_label", "Password")}</label>
             <div className="input-wrapper">
               <input
                 id="password"
                 type="password"
                 className={`form-input ${errors.password ? "error" : ""}`}
-                placeholder="••••••••"
+                placeholder={t("placeholder_password", "••••••••")}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -146,13 +147,13 @@ export default function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmar contraseña</label>
+            <label htmlFor="confirmPassword">{t("confirm_password_label", "Confirm password")}</label>
             <div className="input-wrapper">
               <input
                 id="confirmPassword"
                 type="password"
                 className={`form-input ${errors.confirmPassword ? "error" : ""}`}
-                placeholder="••••••••"
+                placeholder={t("placeholder_confirm_password", "••••••••")}
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
@@ -165,13 +166,13 @@ export default function RegisterPage() {
           </div>
 
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? <><span className="spinner" /> Creando cuenta...</> : "Registrarse"}
+            {loading ? <><span className="spinner" /> {t("creating_account", "Creating account...")}</> : t("register_button", "Register")}
           </button>
         </form>
 
         <div className="auth-footer">
-          ¿Ya tenés cuenta?{" "}
-          <Link href="/">Iniciá sesión</Link>
+          {t("have_account", "Already have an account?")}{" "}
+          <Link href="/">{t("sign_in_link", "Sign in")}</Link>
         </div>
       </div>
     </div>
