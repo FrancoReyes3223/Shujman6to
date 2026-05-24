@@ -16,10 +16,18 @@ export default function DashboardPage() {
       return;
     }
 
+    const token = getCookie("token");
+    if (!token) {
+      router.replace("/");
+      return;
+    }
+
     async function fetchProfile() {
       try {
-        const res = await fetch(`${API_BASE}/usuarios/perfil`, {
-          headers: { Authorization: `Bearer ${getCookie("token")}` },
+        const res = await fetch("http://localhost:3001/api/v1/usuarios/perfil", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         });
         const data = await res.json();
         if (data.success) {

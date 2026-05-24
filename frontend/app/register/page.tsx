@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,12 @@ export default function RegisterPage() {
   }>({});
   const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split("; token=");
+    if (parts.length === 2) router.replace("/dashboard");
+  }, []);
 
   function validate() {
     const newErrors: typeof errors = {};

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,12 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split("; token=");
+    if (parts.length === 2) router.replace("/dashboard");
+  }, []);
 
   function validateEmail(value: string): string | undefined {
     if (!value.trim()) return t("email_required", "Email is required");
