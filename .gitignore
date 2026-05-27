@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# build outputs
+dist/
+out/
+build/
+**/dist/
+frontend/out/
+
+# astro cache
+.astro/
+**/.astro/
+
+# next.js
+frontend/.next/
+
+# docs copied into frontend during build
+frontend/public/docs/
+
+# env
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+*.tsbuildinfo

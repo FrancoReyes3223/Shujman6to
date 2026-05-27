@@ -2,37 +2,43 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { API_BASE } from "../../lib/api";
+
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
+}
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
 
   useEffect(() => {
+    const token = getCookie("token");
+    if (!token) {
+      router.replace("/");
+      return;
+    }
+
     async function fetchProfile() {
       try {
-        const res = await fetch("http://localhost:3001/api/v1/usuarios/perfil", {
-          headers: {
-            // Enviamos el token manualmente o dejamos que el navegador lo envíe si es cookie
-            // Pero como lo guardamos en document.cookie, podemos leerlo
-            "Authorization": `Bearer ${getCookie("token")}`
-          }
+        const res = await fetch(`${API_BASE}/usuarios/perfil`, {
+          headers: { Authorization: `Bearer ${getCookie("token")}` },
         });
         const data = await res.json();
         if (data.success) {
           setUser(data.data);
+        } else {
+          router.replace("/");
         }
-      } catch (err) {
-        console.error("Error fetching profile:", err);
+      } catch {
+        console.error("Error fetching profile");
       }
     }
-    fetchProfile();
-  }, []);
 
-  function getCookie(name: string) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift();
-  }
+    fetchProfile();
+  }, [router]);
 
   function handleLogout() {
     document.cookie = "token=; path=/; max-age=0";

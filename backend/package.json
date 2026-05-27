@@ -1,11 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "type": "module",
   "description": "Backend con arquitectura en capas - Express + Prisma",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -19,7 +19,16 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.0.0",
     "nodemon": "^3.1.4",
-    "prisma": "^6.19.3"
+    "prisma": "^6.19.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0"
   }
 }
