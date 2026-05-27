@@ -11,7 +11,7 @@ Se armó la estructura completa del proyecto desde cero: base de datos, backend 
 
 ## Base de datos
 
-Se usa **PostgreSQL** corriendo en un contenedor Docker. El esquema lo maneja **Prisma ORM**.
+Se usa **SQLite** como base de datos local (un archivo `dev.db`). El esquema lo maneja **Prisma ORM**. No se necesita Docker ni PostgreSQL.
 
 ### Tabla `users`
 
@@ -24,10 +24,9 @@ Se usa **PostgreSQL** corriendo en un contenedor Docker. El esquema lo maneja **
 | `created_at` | DateTime   | Fecha de creación                  |
 | `updated_at` | DateTime   | Fecha de última modificación       |
 
-Para levantar la base de datos:
+Para inicializar la base de datos (solo la primera vez):
 
 ```bash
-docker-compose up -d
 cd backend
 npx prisma migrate dev
 ```
@@ -96,8 +95,7 @@ npm run dev   # Puerto 3000
 
 ## Cómo correr todo junto
 
-1. `docker-compose up -d` — levanta PostgreSQL
-2. `cd backend && npm run dev` — API en puerto 3001
-3. `cd frontend && npm run dev` — App en puerto 3000
+1. `cd backend && npm run dev` — API en puerto 3001
+2. `cd frontend && npm run dev` — App en puerto 3000
 
 Abrir [http://localhost:3000](http://localhost:3000).

@@ -11,7 +11,7 @@ The full project structure was built from scratch: database, REST API backend, a
 
 ## Database
 
-**PostgreSQL** running in a Docker container. Schema managed by **Prisma ORM**.
+**SQLite** as local database (a `dev.db` file). Schema managed by **Prisma ORM**. No Docker or PostgreSQL required.
 
 ### `users` table
 
@@ -24,10 +24,9 @@ The full project structure was built from scratch: database, REST API backend, a
 | `created_at` | DateTime   | Creation date                      |
 | `updated_at` | DateTime   | Last update date                   |
 
-To start the database:
+To initialize the database (first time only):
 
 ```bash
-docker-compose up -d
 cd backend
 npx prisma migrate dev
 ```
@@ -96,8 +95,7 @@ npm run dev   # Port 3000
 
 ## Running everything together
 
-1. `docker-compose up -d` — start PostgreSQL
-2. `cd backend && npm run dev` — API on port 3001
-3. `cd frontend && npm run dev` — App on port 3000
+1. `cd backend && npm run dev` — API on port 3001
+2. `cd frontend && npm run dev` — App on port 3000
 
 Open [http://localhost:3000](http://localhost:3000).
