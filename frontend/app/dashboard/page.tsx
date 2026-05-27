@@ -53,6 +53,10 @@ export default function DashboardPage() {
       ) : (
         <p>Cargando perfil...</p>
       )}
+      {/* TODO: reemplazar '/docs/es' por `/docs/${i18n.language}` cuando se mergee la branch i18n */}
+      <a className="btn-docs" href="/docs/es/">
+        Documentación
+      </a>
       <button className="btn-logout" onClick={handleLogout}>
         Cerrar sesión
       </button>
