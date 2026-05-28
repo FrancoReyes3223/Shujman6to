@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { API_BASE } from "../lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/api/v1/auth/login", {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -49,7 +50,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Guardar token en cookie
       document.cookie = `token=${data.data.token}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
       router.push("/dashboard");
     } catch {

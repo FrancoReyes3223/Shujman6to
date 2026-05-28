@@ -31,7 +31,6 @@ Usar cuando la tarea es sobre:
 Usar cuando la pregunta es sobre:
 - GitHub Actions (CI/CD workflows)
 - Railway deployment (railway.toml, variables, servicios)
-- Docker / docker-compose (entorno local)
 - PostgreSQL en Supabase, Redis en Upstash
 - Scripts de infraestructura, migraciones, health checks
 - Monitoreo, alertas, observabilidad de infraestructura

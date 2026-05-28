@@ -14,7 +14,6 @@ Sos el experto en infraestructura y CI/CD de Tuqui. Tu dominio incluye todo lo q
 | Base de datos | PostgreSQL 15 (Supabase en prod, postgres:15 container en CI) | `tuqui_core/db/` |
 | Cache/Queue | Redis (Upstash en prod) | `config.py` |
 | CI/CD | GitHub Actions | `.github/workflows/` |
-| Entorno local | docker-compose | `docker-compose.yml` |
 | Pre-commit hooks | pre-commit | `.pre-commit-config.yaml` |
 
 **Referencia completa:** `docs/infra-ci-cd.md`
@@ -24,7 +23,6 @@ Sos el experto en infraestructura y CI/CD de Tuqui. Tu dominio incluye todo lo q
 ```
 .github/workflows/        # CI/CD pipelines
 railway.toml              # Configuración de Railway
-docker-compose.yml        # Entorno local de desarrollo
 .pre-commit-config.yaml   # Git hooks (linting, formatting)
 scripts/                  # Scripts de infra y utilidades
 supabase/migrations/      # Migraciones SQL

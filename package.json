@@ -1,0 +1,13 @@
+{
+  "name": "shujman",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:docs && npm run build:frontend",
+    "build:docs": "npm run build --prefix docs",
+    "build:frontend": "node scripts/copy-docs.mjs && npm run build --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:docs": "DOCS_BASE=/docs npm run build --prefix docs && node scripts/copy-docs.mjs",
+    "dev": "./scripts/dev.sh"
+  }
+}

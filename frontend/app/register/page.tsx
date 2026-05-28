@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { API_BASE } from "../../lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/api/v1/auth/register", {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, fullName }),
@@ -70,7 +71,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Registro exitoso, redirigir al login
       router.push("/?registered=true");
     } catch {
       setGeneralError("No se pudo conectar con el servidor");

@@ -20,6 +20,9 @@
 # production
 /build
 
+# docs (generado por build combinado)
+/public/docs
+
 # misc
 .DS_Store
 *.pem
