@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
+import ThemeToggle from "./ThemeToggle";
 
 const LANGS = [
   { code: "es", flag: "🇦🇷", label: "ES" },
@@ -16,7 +17,7 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="lang-switcher" style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 999999, pointerEvents: 'auto' }}>
+    <div className="lang-switcher" style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 999999, pointerEvents: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
       {LANGS.map(({ code, flag, label }) => (
         <button
           key={code}
@@ -30,6 +31,7 @@ export default function LanguageSwitcher() {
           <span>{label}</span>
         </button>
       ))}
+      <ThemeToggle />
     </div>
   );
 }

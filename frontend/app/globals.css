@@ -1,23 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-card: #1a1a2e;
-  --bg-input: #16162a;
-  --border-color: #2a2a4a;
-  --border-focus: #6c5ce7;
-  --text-primary: #e8e8f0;
-  --text-secondary: #8888aa;
-  --text-muted: #5555777;
-  --accent: #6c5ce7;
-  --accent-hover: #7d6ff0;
-  --accent-glow: rgba(108, 92, 231, 0.3);
-  --error: #ff4757;
-  --error-bg: rgba(255, 71, 87, 0.1);
-  --success: #2ed573;
+  --bg-primary: #eef4fb;
+  --bg-secondary: #dce8f5;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --border-color: rgba(30, 80, 160, 0.12);
+  --border-focus: #4a90d9;
+  --text-primary: #1a3a6b;
+  --text-secondary: #2e6db4;
+  --text-muted: rgba(30, 80, 160, 0.55);
+  --accent: #1e50a0;
+  --accent-hover: #2e6db4;
+  --accent-glow: rgba(74, 144, 217, 0.3);
+  --gold: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.3);
+  --gradient-start: #0a192f;
+  --error: #bc4749;
+  --error-bg: rgba(188, 71, 73, 0.1);
+  --success: #2e9e6e;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+.dark {
+  --bg-primary: #0d1b2e;
+  --bg-secondary: #162540;
+  --bg-card: #1a2e4a;
+  --bg-input: #122035;
+  --border-color: rgba(74, 144, 217, 0.2);
+  --border-focus: #4a90d9;
+  --text-primary: #ddeeff;
+  --text-secondary: #7ab8f5;
+  --text-muted: rgba(221, 238, 255, 0.55);
+  --accent: #2e6db4;
+  --accent-hover: #4a90d9;
+  --accent-glow: rgba(74, 144, 217, 0.3);
+  --gold: #e6c25a;
+  --gold-glow: rgba(230, 194, 90, 0.3);
+  --gradient-start: #a2ccf2;
+  --error: #e05a5c;
+  --error-bg: rgba(224, 90, 92, 0.2);
+  --success: #3cc48a;
 }
 
 @theme inline {
@@ -38,6 +62,12 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth theme transitions for all elements */
+*, *::before, *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* ===== AUTH LAYOUT ===== */
@@ -60,12 +90,12 @@ body {
   height: 200%;
   background: radial-gradient(
     ellipse at 30% 20%,
-    rgba(108, 92, 231, 0.08) 0%,
+    rgba(74, 144, 217, 0.18) 0%,
     transparent 50%
   ),
   radial-gradient(
     ellipse at 70% 80%,
-    rgba(108, 92, 231, 0.05) 0%,
+    rgba(46, 109, 180, 0.12) 0%,
     transparent 50%
   );
   pointer-events: none;
@@ -81,8 +111,8 @@ body {
   padding: 2.5rem;
   position: relative;
   z-index: 1;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
-              0 0 0 1px rgba(108, 92, 231, 0.05);
+  box-shadow: 0 12px 40px rgba(56, 102, 65, 0.08),
+              0 0 0 1px rgba(106, 153, 78, 0.1);
   animation: cardSlideUp 0.5s ease-out;
 }
 
@@ -150,8 +180,8 @@ body {
 }
 
 .form-input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-glow);
 }
 
 .form-input.error {
@@ -195,7 +225,8 @@ body {
 
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
-  box-shadow: 0 4px 16px var(--accent-glow);
+  box-shadow: 0 4px 16px var(--gold-glow);
+  border-color: var(--gold);
   transform: translateY(-1px);
 }
 
@@ -272,7 +303,7 @@ body {
   font-size: 2.5rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--accent), #a29bfe);
+  background: linear-gradient(135deg, var(--gradient-start), var(--gold));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -329,6 +360,27 @@ body {
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+}
+
+/* ===== THEME TOGGLE BUTTON ===== */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .lang-option:hover {
