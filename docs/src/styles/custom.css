@@ -1,0 +1,117 @@
+/* Shujman theme — matches the main app's blue palette */
+
+:root {
+  --sl-color-accent-low:  rgba(74, 144, 217, 0.2);
+  --sl-color-accent:      #1e50a0;
+  --sl-color-accent-high: #4a90d9;
+
+  --sl-color-white:       #1a3a6b;
+  --sl-color-gray-1:      #2e6db4;
+  --sl-color-gray-2:      #3a7ecf;
+  --sl-color-gray-3:      rgba(30, 80, 160, 0.55);
+  --sl-color-gray-4:      rgba(30, 80, 160, 0.20);
+  --sl-color-gray-5:      #dce8f5;
+  --sl-color-gray-6:      #eef4fb;
+  --sl-color-black:       #eef4fb;
+
+  --sl-color-bg:          #eef4fb;
+  --sl-color-bg-nav:      #ffffff;
+  --sl-color-bg-sidebar:  #dce8f5;
+  --sl-color-bg-inline-code: rgba(30, 80, 160, 0.08);
+
+  --sl-color-hairline-light: rgba(30, 80, 160, 0.12);
+  --sl-color-hairline-shade: rgba(30, 80, 160, 0.08);
+
+  --sl-color-text:        #1a3a6b;
+  --sl-color-text-accent: #2e6db4;
+
+  --sl-font: ui-sans-serif, system-ui, sans-serif;
+  --sl-text-body-sm:      0.875rem;
+}
+
+[data-theme="dark"] {
+  --sl-color-accent-low:  rgba(74, 144, 217, 0.15);
+  --sl-color-accent:      #2e6db4;
+  --sl-color-accent-high: #4a90d9;
+
+  --sl-color-white:       #ddeeff;
+  --sl-color-gray-1:      #7ab8f5;
+  --sl-color-gray-2:      #5a9de0;
+  --sl-color-gray-3:      rgba(221, 238, 255, 0.55);
+  --sl-color-gray-4:      rgba(74, 144, 217, 0.25);
+  --sl-color-gray-5:      #162540;
+  --sl-color-gray-6:      #0d1b2e;
+  --sl-color-black:       #0d1b2e;
+
+  --sl-color-bg:          #0d1b2e;
+  --sl-color-bg-nav:      #1a2e4a;
+  --sl-color-bg-sidebar:  #162540;
+  --sl-color-bg-inline-code: rgba(74, 144, 217, 0.12);
+
+  --sl-color-hairline-light: rgba(74, 144, 217, 0.2);
+  --sl-color-hairline-shade: rgba(74, 144, 217, 0.1);
+
+  --sl-color-text:        #ddeeff;
+  --sl-color-text-accent: #7ab8f5;
+}
+
+/* ===== HEADER RIGHT GROUP — pill container matching app's .lang-switcher ===== */
+
+.right-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--sl-color-bg-nav);
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Lang buttons first, theme toggle last — matches the app's order */
+starlight-lang-select,
+.lang-buttons { order: 1; }
+starlight-theme-toggle { order: 2; }
+
+/* Search button — consistent with the pill group */
+site-search button[data-open-modal] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--sl-color-hairline-light);
+  background: var(--sl-color-bg-nav);
+  color: var(--sl-color-gray-1);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+site-search button[data-open-modal]:hover {
+  background: var(--sl-color-gray-5);
+  color: var(--sl-color-white);
+  border-color: var(--sl-color-accent);
+}
+
+/* ===== ACCENT LINKS AND HIGHLIGHTS ===== */
+/* Accent links and highlights */
+a {
+  color: var(--sl-color-accent-high);
+}
+
+/* Starlight site header */
+header.header {
+  border-bottom-color: var(--sl-color-hairline-light);
+  background: var(--sl-color-bg-nav);
+}
+
+/* Sidebar active item */
+.sidebar-content a[aria-current="page"],
+nav a[aria-current="page"] {
+  background: rgba(74, 144, 217, 0.12);
+  color: var(--sl-color-accent-high);
+  border-radius: 6px;
+}

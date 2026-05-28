@@ -44,10 +44,12 @@ export default function DashboardPage() {
         if (data.success) {
           setUser(data.data);
         } else {
+          document.cookie = "token=; path=/; max-age=0";
           router.replace("/");
         }
       } catch {
-        console.error("Error fetching profile");
+        document.cookie = "token=; path=/; max-age=0";
+        router.replace("/");
       }
     }
 
@@ -71,6 +73,7 @@ export default function DashboardPage() {
       />
       
       <main className="dashboard-main">
+
         <div style={{ display: activeTab === "overview" ? "block" : "none" }}>
           <OverviewView employees={employees} products={products} />
         </div>
