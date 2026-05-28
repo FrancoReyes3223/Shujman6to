@@ -2,12 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import Sidebar from "../../components/Sidebar";
+import OverviewView from "../../components/OverviewView";
+import EmployeesView, { INITIAL_EMPLOYEES } from "../../components/EmployeesView";
+import ProductsView, { INITIAL_PRODUCTS } from "../../components/ProductsView";
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
   const router = useRouter();
   const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
 
   useEffect(() => {
     function getCookie(name: string) {
@@ -50,20 +57,27 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="dashboard-container">
-      <h1>{t("dashboard_title", "Home")}</h1>
-      {user ? (
-        <p>{t("welcome_message", "Welcome, {{name}}! You have successfully signed in.", { name: user.fullName })}</p>
-      ) : (
-        <p>{t("loading_profile", "Loading profile...")}</p>
-      )}
-      {/* TODO: reemplazar '/docs/es' por `/docs/${i18n.language}` cuando se mergee la branch i18n */}
-      <a className="btn-docs" href="/docs/es/">
-        Documentación
-      </a>
-      <button className="btn-logout" onClick={handleLogout}>
-        {t("logout", "Log out")}
-      </button>
+    <div className="dashboard-layout">
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        onLogout={handleLogout} 
+        userFullName={user?.fullName}
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+      />
+      
+      <main className="dashboard-main">
+        <div style={{ display: activeTab === "overview" ? "block" : "none" }}>
+          <OverviewView employees={employees} products={products} />
+        </div>
+        <div style={{ display: activeTab === "employees" ? "block" : "none" }}>
+          <EmployeesView employees={employees} setEmployees={setEmployees} />
+        </div>
+        <div style={{ display: activeTab === "products" ? "block" : "none" }}>
+          <ProductsView products={products} setProducts={setProducts} />
+        </div>
+      </main>
     </div>
   );
 }
