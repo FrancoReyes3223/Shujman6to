@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export type Product = { id: number; name: string; category: string; price: string; stock: string; status: string };
 
@@ -16,35 +17,157 @@ const EditIcon = () => (
   </svg>
 );
 
-const SaveIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
+const CloseIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 );
 
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  </svg>
+);
+
+const EMPTY_PROD = { name: "", category: "", price: "", stock: "", status: "Normal" };
+
+type ProdForm = Omit<Product, "id">;
+
+function normalizePrice(price: string) {
+  return price && !price.startsWith('$') ? '$' + price : price;
+}
+
+function ProdModal({
+  title,
+  form,
+  onChange,
+  onClose,
+  onSubmit,
+}: {
+  title: string;
+  form: ProdForm;
+  onChange: (f: ProdForm) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>{title}</h2>
+          <button className="btn-close" onClick={onClose}><CloseIcon /></button>
+        </div>
+        <div className="modal-body">
+          <div className="form-group">
+            <label>{t("prod_col_name", "Nombre del Producto/Servicio")}</label>
+            <input
+              className="form-input"
+              value={form.name}
+              onChange={e => onChange({ ...form, name: e.target.value })}
+              placeholder={t("prod_col_name", "Nombre del Producto/Servicio")}
+              autoFocus
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_category", "Categoría")}</label>
+            <input
+              className="form-input"
+              value={form.category}
+              onChange={e => onChange({ ...form, category: e.target.value })}
+              placeholder={t("prod_col_category", "Categoría")}
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_price", "Precio")}</label>
+            <input
+              className="form-input"
+              value={form.price}
+              onChange={e => onChange({ ...form, price: e.target.value })}
+              placeholder="$0.00"
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_stock", "Stock")}</label>
+            <input
+              className="form-input"
+              value={form.stock}
+              onChange={e => onChange({ ...form, stock: e.target.value })}
+              placeholder={t("prod_col_stock", "Stock")}
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_status", "Estado")}</label>
+            <select
+              className="form-input"
+              value={form.status}
+              onChange={e => onChange({ ...form, status: e.target.value })}
+            >
+              <option value="Normal">{t("status_normal", "Normal")}</option>
+              <option value="Bajo">{t("status_low", "Bajo")}</option>
+              <option value="Agotado">{t("status_out", "Agotado")}</option>
+            </select>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button
+            className="btn-primary"
+            style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+            onClick={onClose}
+          >
+            {t("btn_cancel", "Cancelar")}
+          </button>
+          <button
+            className="btn-primary"
+            style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+            onClick={onSubmit}
+            disabled={!form.name.trim()}
+          >
+            {t("btn_save", "Guardar")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductsView({ products, setProducts }: { products: Product[], setProducts: (prods: Product[]) => void }) {
+  const { t } = useTranslation();
 
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editFormData, setEditFormData] = useState<Product | null>(null);
+  const [addForm, setAddForm] = useState<ProdForm>(EMPTY_PROD);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  const handleEditClick = (prod: Product) => {
-    setEditingId(prod.id);
-    setEditFormData({ ...prod });
-  };
+  const [editTarget, setEditTarget] = useState<Product | null>(null);
+  const [editForm, setEditForm] = useState<ProdForm>(EMPTY_PROD);
+
+  const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
   const handleAddNew = () => {
-    const newId = Date.now();
-    const newProd: Product = { id: newId, name: "", category: "", price: "", stock: "", status: "Normal" };
-    setProducts([newProd, ...products]);
-    setEditingId(newId);
-    setEditFormData({ ...newProd });
+    setAddForm(EMPTY_PROD);
+    setShowAddModal(true);
   };
 
-  const handleSave = () => {
-    if (editFormData) {
-      setProducts(products.map(prod => prod.id === editFormData.id ? editFormData : prod));
-      setEditingId(null);
-    }
+  const handleAddSubmit = () => {
+    if (!addForm.name.trim()) return;
+    setProducts([{ id: Date.now(), ...addForm, price: normalizePrice(addForm.price) }, ...products]);
+    setShowAddModal(false);
+  };
+
+  const handleEditClick = (prod: Product) => {
+    setEditTarget(prod);
+    setEditForm({ name: prod.name, category: prod.category, price: prod.price, stock: prod.stock, status: prod.status });
+  };
+
+  const handleEditSubmit = () => {
+    if (!editTarget || !editForm.name.trim()) return;
+    setProducts(products.map(p => p.id === editTarget.id ? { ...editTarget, ...editForm, price: normalizePrice(editForm.price) } : p));
+    setEditTarget(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return;
+    setProducts(products.filter(p => p.id !== deleteTarget.id));
+    setDeleteTarget(null);
   };
 
   return (
@@ -52,129 +175,119 @@ export default function ProductsView({ products, setProducts }: { products: Prod
       <div className="dashboard-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-          <h1>Productos y Stock</h1>
+          <h1>{t("prod_title", "Productos y Stock")}</h1>
         </div>
-        <p>Monitoriza los precios y el inventario de tus productos o servicios.</p>
+        <p>{t("prod_desc", "Monitoriza los precios y el inventario de tus productos o servicios.")}</p>
       </div>
 
       <div className="table-container">
         <div className="table-header">
-          <h2>Inventario Actual</h2>
-          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>+ Nuevo Producto</button>
+          <h2>{t("prod_list_title", "Inventario Actual")}</h2>
+          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
+            {t("prod_btn_new", "+ Nuevo Producto")}
+          </button>
         </div>
         <table className="data-table">
           <thead>
             <tr>
-              <th>Nombre del Producto/Servicio</th>
-              <th>Categoría</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Estado</th>
-              <th style={{ width: '80px', textAlign: 'center' }}>Acciones</th>
+              <th>{t("prod_col_name", "Nombre del Producto/Servicio")}</th>
+              <th>{t("prod_col_category", "Categoría")}</th>
+              <th>{t("prod_col_price", "Precio")}</th>
+              <th>{t("prod_col_stock", "Stock")}</th>
+              <th>{t("prod_col_status", "Estado")}</th>
+              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Acciones")}</th>
             </tr>
           </thead>
           <tbody>
             {products.map((prod) => (
               <tr key={prod.id}>
-                <td style={{ fontWeight: 500 }}>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.name} 
-                      onChange={e => setEditFormData({...editFormData!, name: e.target.value})}
-                    />
-                  ) : (
-                    prod.name
-                  )}
-                </td>
+                <td style={{ fontWeight: 500 }}>{prod.name}</td>
+                <td>{prod.category}</td>
+                <td>{prod.price}</td>
+                <td>{prod.stock}</td>
                 <td>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.category} 
-                      onChange={e => setEditFormData({...editFormData!, category: e.target.value})}
-                    />
-                  ) : (
-                    prod.category
-                  )}
-                </td>
-                <td>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.price} 
-                      onChange={e => {
-                        let val = e.target.value;
-                        if (val && !val.startsWith('$')) val = '$' + val;
-                        setEditFormData({...editFormData!, price: val});
-                      }}
-                    />
-                  ) : (
-                    prod.price
-                  )}
-                </td>
-                <td>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.stock} 
-                      onChange={e => setEditFormData({...editFormData!, stock: e.target.value})}
-                    />
-                  ) : (
-                    prod.stock
-                  )}
-                </td>
-                <td>
-                  {editingId === prod.id ? (
-                    <select 
-                      className="form-input"
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.status}
-                      onChange={e => setEditFormData({...editFormData!, status: e.target.value})}
-                    >
-                      <option value="Normal">Normal</option>
-                      <option value="Bajo">Bajo</option>
-                      <option value="Agotado">Agotado</option>
-                    </select>
-                  ) : (
-                    <span className={`badge ${
-                      prod.status === 'Normal' ? 'badge-success' : 
-                      prod.status === 'Bajo' ? 'badge-warning' : 'badge-error'
-                    }`}>
-                      {prod.status}
-                    </span>
-                  )}
+                  <span className={`badge ${
+                    prod.status === 'Normal' ? 'badge-success' :
+                    prod.status === 'Bajo' ? 'badge-warning' : 'badge-error'
+                  }`}>
+                    {prod.status === 'Normal' ? t('status_normal', 'Normal') : prod.status === 'Bajo' ? t('status_low', 'Bajo') : t('status_out', 'Agotado')}
+                  </span>
                 </td>
                 <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                  {editingId === prod.id ? (
-                    <button 
-                      className="btn-action" 
-                      onClick={handleSave}
-                      title="Guardar"
-                      style={{ cursor: 'pointer', color: 'var(--success)', borderColor: 'var(--success)' }}
-                    >
-                      <SaveIcon />
-                    </button>
-                  ) : (
-                    <button 
-                      className="btn-action" 
-                      onClick={() => handleEditClick(prod)}
-                      title="Editar producto"
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <EditIcon />
-                    </button>
-                  )}
+                  <button
+                    className="btn-action"
+                    onClick={() => handleEditClick(prod)}
+                    title={t("prod_btn_edit", "Editar producto")}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <EditIcon />
+                  </button>
+                  <button
+                    className="btn-action"
+                    onClick={() => setDeleteTarget(prod)}
+                    title={t("btn_delete", "Eliminar")}
+                    style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
+                  >
+                    <TrashIcon />
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {showAddModal && (
+        <ProdModal
+          title={t("prod_btn_new", "+ Nuevo Producto")}
+          form={addForm}
+          onChange={setAddForm}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleAddSubmit}
+        />
+      )}
+
+      {editTarget && (
+        <ProdModal
+          title={t("prod_btn_edit", "Editar producto")}
+          form={editForm}
+          onChange={setEditForm}
+          onClose={() => setEditTarget(null)}
+          onSubmit={handleEditSubmit}
+        />
+      )}
+
+      {deleteTarget && (
+        <div className="modal-overlay" onClick={() => setDeleteTarget(null)}>
+          <div className="modal-content" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{t("delete_confirm_title", "Confirmar eliminación")}</h2>
+              <button className="btn-close" onClick={() => setDeleteTarget(null)}><CloseIcon /></button>
+            </div>
+            <div className="modal-body">
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {t("prod_delete_confirm", "¿Estás seguro de que querés eliminar {{name}}? Esta acción no se puede deshacer.", { name: deleteTarget.name })}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-primary"
+                style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+                onClick={() => setDeleteTarget(null)}
+              >
+                {t("btn_cancel", "Cancelar")}
+              </button>
+              <button
+                className="btn-primary"
+                style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem', background: 'var(--error)', boxShadow: 'none' }}
+                onClick={handleDeleteConfirm}
+              >
+                {t("btn_delete", "Eliminar")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
