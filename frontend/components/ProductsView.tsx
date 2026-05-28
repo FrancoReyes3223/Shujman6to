@@ -17,45 +17,143 @@ const EditIcon = () => (
   </svg>
 );
 
-const SaveIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
+const CloseIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 );
 
 const EMPTY_PROD = { name: "", category: "", price: "", stock: "", status: "Normal" };
 
+type ProdForm = Omit<Product, "id">;
+
+function normalizePrice(price: string) {
+  return price && !price.startsWith('$') ? '$' + price : price;
+}
+
+function ProdModal({
+  title,
+  form,
+  onChange,
+  onClose,
+  onSubmit,
+}: {
+  title: string;
+  form: ProdForm;
+  onChange: (f: ProdForm) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>{title}</h2>
+          <button className="btn-close" onClick={onClose}><CloseIcon /></button>
+        </div>
+        <div className="modal-body">
+          <div className="form-group">
+            <label>{t("prod_col_name", "Nombre del Producto/Servicio")}</label>
+            <input
+              className="form-input"
+              value={form.name}
+              onChange={e => onChange({ ...form, name: e.target.value })}
+              placeholder={t("prod_col_name", "Nombre del Producto/Servicio")}
+              autoFocus
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_category", "Categoría")}</label>
+            <input
+              className="form-input"
+              value={form.category}
+              onChange={e => onChange({ ...form, category: e.target.value })}
+              placeholder={t("prod_col_category", "Categoría")}
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_price", "Precio")}</label>
+            <input
+              className="form-input"
+              value={form.price}
+              onChange={e => onChange({ ...form, price: e.target.value })}
+              placeholder="$0.00"
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_stock", "Stock")}</label>
+            <input
+              className="form-input"
+              value={form.stock}
+              onChange={e => onChange({ ...form, stock: e.target.value })}
+              placeholder={t("prod_col_stock", "Stock")}
+            />
+          </div>
+          <div className="form-group">
+            <label>{t("prod_col_status", "Estado")}</label>
+            <select
+              className="form-input"
+              value={form.status}
+              onChange={e => onChange({ ...form, status: e.target.value })}
+            >
+              <option value="Normal">{t("status_normal", "Normal")}</option>
+              <option value="Bajo">{t("status_low", "Bajo")}</option>
+              <option value="Agotado">{t("status_out", "Agotado")}</option>
+            </select>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button
+            className="btn-primary"
+            style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+            onClick={onClose}
+          >
+            {t("btn_cancel", "Cancelar")}
+          </button>
+          <button
+            className="btn-primary"
+            style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+            onClick={onSubmit}
+            disabled={!form.name.trim()}
+          >
+            {t("btn_save", "Guardar")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductsView({ products, setProducts }: { products: Product[], setProducts: (prods: Product[]) => void }) {
   const { t } = useTranslation();
 
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editFormData, setEditFormData] = useState<Product | null>(null);
+  const [addForm, setAddForm] = useState<ProdForm>(EMPTY_PROD);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newForm, setNewForm] = useState<Omit<Product, "id">>(EMPTY_PROD);
 
-  const handleEditClick = (prod: Product) => {
-    setEditingId(prod.id);
-    setEditFormData({ ...prod });
-  };
+  const [editTarget, setEditTarget] = useState<Product | null>(null);
+  const [editForm, setEditForm] = useState<ProdForm>(EMPTY_PROD);
 
   const handleAddNew = () => {
-    setNewForm(EMPTY_PROD);
+    setAddForm(EMPTY_PROD);
     setShowAddModal(true);
   };
 
   const handleAddSubmit = () => {
-    if (!newForm.name.trim()) return;
-    let price = newForm.price;
-    if (price && !price.startsWith('$')) price = '$' + price;
-    setProducts([{ id: Date.now(), ...newForm, price }, ...products]);
+    if (!addForm.name.trim()) return;
+    setProducts([{ id: Date.now(), ...addForm, price: normalizePrice(addForm.price) }, ...products]);
     setShowAddModal(false);
   };
 
-  const handleSave = () => {
-    if (editFormData) {
-      setProducts(products.map(prod => prod.id === editFormData.id ? editFormData : prod));
-      setEditingId(null);
-    }
+  const handleEditClick = (prod: Product) => {
+    setEditTarget(prod);
+    setEditForm({ name: prod.name, category: prod.category, price: prod.price, stock: prod.stock, status: prod.status });
+  };
+
+  const handleEditSubmit = () => {
+    if (!editTarget || !editForm.name.trim()) return;
+    setProducts(products.map(p => p.id === editTarget.id ? { ...editTarget, ...editForm, price: normalizePrice(editForm.price) } : p));
+    setEditTarget(null);
   };
 
   return (
@@ -71,7 +169,9 @@ export default function ProductsView({ products, setProducts }: { products: Prod
       <div className="table-container">
         <div className="table-header">
           <h2>{t("prod_list_title", "Inventario Actual")}</h2>
-          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>{t("prod_btn_new", "+ Nuevo Producto")}</button>
+          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
+            {t("prod_btn_new", "+ Nuevo Producto")}
+          </button>
         </div>
         <table className="data-table">
           <thead>
@@ -87,99 +187,27 @@ export default function ProductsView({ products, setProducts }: { products: Prod
           <tbody>
             {products.map((prod) => (
               <tr key={prod.id}>
-                <td style={{ fontWeight: 500 }}>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.name} 
-                      onChange={e => setEditFormData({...editFormData!, name: e.target.value})}
-                    />
-                  ) : (
-                    prod.name
-                  )}
-                </td>
+                <td style={{ fontWeight: 500 }}>{prod.name}</td>
+                <td>{prod.category}</td>
+                <td>{prod.price}</td>
+                <td>{prod.stock}</td>
                 <td>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.category} 
-                      onChange={e => setEditFormData({...editFormData!, category: e.target.value})}
-                    />
-                  ) : (
-                    prod.category
-                  )}
-                </td>
-                <td>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.price} 
-                      onChange={e => {
-                        let val = e.target.value;
-                        if (val && !val.startsWith('$')) val = '$' + val;
-                        setEditFormData({...editFormData!, price: val});
-                      }}
-                    />
-                  ) : (
-                    prod.price
-                  )}
-                </td>
-                <td>
-                  {editingId === prod.id ? (
-                    <input 
-                      className="form-input" 
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.stock} 
-                      onChange={e => setEditFormData({...editFormData!, stock: e.target.value})}
-                    />
-                  ) : (
-                    prod.stock
-                  )}
-                </td>
-                <td>
-                  {editingId === prod.id ? (
-                    <select 
-                      className="form-input"
-                      style={{ padding: '0.25rem 0.5rem', margin: 0 }}
-                      value={editFormData?.status}
-                      onChange={e => setEditFormData({...editFormData!, status: e.target.value})}
-                    >
-                      <option value="Normal">{t("status_normal", "Normal")}</option>
-                      <option value="Bajo">{t("status_low", "Bajo")}</option>
-                      <option value="Agotado">{t("status_out", "Agotado")}</option>
-                    </select>
-                  ) : (
-                    <span className={`badge ${
-                      prod.status === 'Normal' ? 'badge-success' :
-                      prod.status === 'Bajo' ? 'badge-warning' : 'badge-error'
-                    }`}>
-                      {prod.status === 'Normal' ? t('status_normal', 'Normal') : prod.status === 'Bajo' ? t('status_low', 'Bajo') : t('status_out', 'Agotado')}
-                    </span>
-                  )}
+                  <span className={`badge ${
+                    prod.status === 'Normal' ? 'badge-success' :
+                    prod.status === 'Bajo' ? 'badge-warning' : 'badge-error'
+                  }`}>
+                    {prod.status === 'Normal' ? t('status_normal', 'Normal') : prod.status === 'Bajo' ? t('status_low', 'Bajo') : t('status_out', 'Agotado')}
+                  </span>
                 </td>
                 <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                  {editingId === prod.id ? (
-                    <button 
-                      className="btn-action" 
-                      onClick={handleSave}
-                      title={t("btn_save", "Guardar")}
-                      style={{ cursor: 'pointer', color: 'var(--success)', borderColor: 'var(--success)' }}
-                    >
-                      <SaveIcon />
-                    </button>
-                  ) : (
-                    <button 
-                      className="btn-action" 
-                      onClick={() => handleEditClick(prod)}
-                      title={t("prod_btn_edit", "Editar producto")}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <EditIcon />
-                    </button>
-                  )}
+                  <button
+                    className="btn-action"
+                    onClick={() => handleEditClick(prod)}
+                    title={t("prod_btn_edit", "Editar producto")}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <EditIcon />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -188,84 +216,23 @@ export default function ProductsView({ products, setProducts }: { products: Prod
       </div>
 
       {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{t("prod_btn_new", "+ Nuevo Producto")}</h2>
-              <button className="btn-close" onClick={() => setShowAddModal(false)}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label>{t("prod_col_name", "Nombre del Producto/Servicio")}</label>
-                <input
-                  className="form-input"
-                  value={newForm.name}
-                  onChange={e => setNewForm({ ...newForm, name: e.target.value })}
-                  placeholder={t("prod_col_name", "Nombre del Producto/Servicio")}
-                  autoFocus
-                />
-              </div>
-              <div className="form-group">
-                <label>{t("prod_col_category", "Categoría")}</label>
-                <input
-                  className="form-input"
-                  value={newForm.category}
-                  onChange={e => setNewForm({ ...newForm, category: e.target.value })}
-                  placeholder={t("prod_col_category", "Categoría")}
-                />
-              </div>
-              <div className="form-group">
-                <label>{t("prod_col_price", "Precio")}</label>
-                <input
-                  className="form-input"
-                  value={newForm.price}
-                  onChange={e => setNewForm({ ...newForm, price: e.target.value })}
-                  placeholder="$0.00"
-                />
-              </div>
-              <div className="form-group">
-                <label>{t("prod_col_stock", "Stock")}</label>
-                <input
-                  className="form-input"
-                  value={newForm.stock}
-                  onChange={e => setNewForm({ ...newForm, stock: e.target.value })}
-                  placeholder={t("prod_col_stock", "Stock")}
-                />
-              </div>
-              <div className="form-group">
-                <label>{t("prod_col_status", "Estado")}</label>
-                <select
-                  className="form-input"
-                  value={newForm.status}
-                  onChange={e => setNewForm({ ...newForm, status: e.target.value })}
-                >
-                  <option value="Normal">{t("status_normal", "Normal")}</option>
-                  <option value="Bajo">{t("status_low", "Bajo")}</option>
-                  <option value="Agotado">{t("status_out", "Agotado")}</option>
-                </select>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                className="btn-primary"
-                style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
-                onClick={() => setShowAddModal(false)}
-              >
-                {t("btn_cancel", "Cancelar")}
-              </button>
-              <button
-                className="btn-primary"
-                style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
-                onClick={handleAddSubmit}
-                disabled={!newForm.name.trim()}
-              >
-                {t("btn_save", "Guardar")}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProdModal
+          title={t("prod_btn_new", "+ Nuevo Producto")}
+          form={addForm}
+          onChange={setAddForm}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleAddSubmit}
+        />
+      )}
+
+      {editTarget && (
+        <ProdModal
+          title={t("prod_btn_edit", "Editar producto")}
+          form={editForm}
+          onChange={setEditForm}
+          onClose={() => setEditTarget(null)}
+          onSubmit={handleEditSubmit}
+        />
       )}
     </div>
   );
