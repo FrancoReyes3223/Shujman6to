@@ -81,6 +81,10 @@ const en = {
   // Footer
   docs_button: "View documentation",
   btn_cancel: "Cancel",
+  btn_delete: "Delete",
+  delete_confirm_title: "Confirm deletion",
+  emp_delete_confirm: "Are you sure you want to delete {{name}}? This action cannot be undone.",
+  prod_delete_confirm: "Are you sure you want to delete {{name}}? This action cannot be undone.",
 };
 
 const es = {
@@ -163,6 +167,10 @@ const es = {
   // Footer
   docs_button: "Ver documentación",
   btn_cancel: "Cancelar",
+  btn_delete: "Eliminar",
+  delete_confirm_title: "Confirmar eliminación",
+  emp_delete_confirm: "¿Estás seguro de que querés eliminar a {{name}}? Esta acción no se puede deshacer.",
+  prod_delete_confirm: "¿Estás seguro de que querés eliminar {{name}}? Esta acción no se puede deshacer.",
 };
 
 if (!i18n.isInitialized) {

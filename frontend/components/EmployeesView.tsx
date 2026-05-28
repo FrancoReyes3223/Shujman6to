@@ -23,6 +23,12 @@ const CloseIcon = () => (
   </svg>
 );
 
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  </svg>
+);
+
 const EMPTY_EMP = { name: "", role: "", department: "", status: "Activo" };
 
 type EmpForm = Omit<Employee, "id">;
@@ -121,6 +127,8 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
   const [editTarget, setEditTarget] = useState<Employee | null>(null);
   const [editForm, setEditForm] = useState<EmpForm>(EMPTY_EMP);
 
+  const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
+
   const handleAddNew = () => {
     setAddForm(EMPTY_EMP);
     setShowAddModal(true);
@@ -141,6 +149,12 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
     if (!editTarget || !editForm.name.trim()) return;
     setEmployees(employees.map(e => e.id === editTarget.id ? { ...editTarget, ...editForm } : e));
     setEditTarget(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return;
+    setEmployees(employees.filter(e => e.id !== deleteTarget.id));
+    setDeleteTarget(null);
   };
 
   return (
@@ -193,6 +207,14 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
                   >
                     <EditIcon />
                   </button>
+                  <button
+                    className="btn-action"
+                    onClick={() => setDeleteTarget(emp)}
+                    title={t("btn_delete", "Eliminar")}
+                    style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
+                  >
+                    <TrashIcon />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -218,6 +240,38 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
           onClose={() => setEditTarget(null)}
           onSubmit={handleEditSubmit}
         />
+      )}
+
+      {deleteTarget && (
+        <div className="modal-overlay" onClick={() => setDeleteTarget(null)}>
+          <div className="modal-content" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{t("delete_confirm_title", "Confirmar eliminación")}</h2>
+              <button className="btn-close" onClick={() => setDeleteTarget(null)}><CloseIcon /></button>
+            </div>
+            <div className="modal-body">
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {t("emp_delete_confirm", "¿Estás seguro de que querés eliminar a {{name}}? Esta acción no se puede deshacer.", { name: deleteTarget.name })}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-primary"
+                style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+                onClick={() => setDeleteTarget(null)}
+              >
+                {t("btn_cancel", "Cancelar")}
+              </button>
+              <button
+                className="btn-primary"
+                style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem', background: 'var(--error)', boxShadow: 'none' }}
+                onClick={handleDeleteConfirm}
+              >
+                {t("btn_delete", "Eliminar")}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
