@@ -300,13 +300,14 @@ body {
   width: 280px;
   background: var(--bg-card);
   border-right: 1px solid var(--border-color);
-  padding: 1.5rem;
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   flex-shrink: 0;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
   transition: width 0.3s ease;
+  overflow-y: auto;
 }
 
 .dashboard-sidebar.closed {
@@ -337,6 +338,48 @@ body {
 .dashboard-header p {
   color: var(--text-secondary);
   font-size: 1rem;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebar-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0 1rem;
+  margin-bottom: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.nav-item.coming-soon {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.nav-item.coming-soon:hover {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.coming-soon-badge {
+  margin-left: auto;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  flex-shrink: 0;
 }
 
 .sidebar-nav {
@@ -633,6 +676,7 @@ body {
   background: var(--error-bg);
 }
 
+/* ===== LANG SWITCHER ===== */
 .lang-switcher {
   position: fixed;
   top: 1rem;

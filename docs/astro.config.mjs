@@ -16,6 +16,11 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Shujman',
+      customCss: ['./src/styles/custom.css'],
+      components: {
+        ThemeSelect: './src/components/ThemeSelect.astro',
+        LanguageSelect: './src/components/LanguageSelect.astro',
+      },
       defaultLocale: 'es',
       locales: {
         es: { label: 'Español', lang: 'es' },
