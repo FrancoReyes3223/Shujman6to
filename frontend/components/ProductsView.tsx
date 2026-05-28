@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export type Product = { id: number; name: string; category: string; price: string; stock: string; status: string };
 
@@ -22,10 +23,15 @@ const SaveIcon = () => (
   </svg>
 );
 
+const EMPTY_PROD = { name: "", category: "", price: "", stock: "", status: "Normal" };
+
 export default function ProductsView({ products, setProducts }: { products: Product[], setProducts: (prods: Product[]) => void }) {
+  const { t } = useTranslation();
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<Product | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newForm, setNewForm] = useState<Omit<Product, "id">>(EMPTY_PROD);
 
   const handleEditClick = (prod: Product) => {
     setEditingId(prod.id);
@@ -33,11 +39,16 @@ export default function ProductsView({ products, setProducts }: { products: Prod
   };
 
   const handleAddNew = () => {
-    const newId = Date.now();
-    const newProd: Product = { id: newId, name: "", category: "", price: "", stock: "", status: "Normal" };
-    setProducts([newProd, ...products]);
-    setEditingId(newId);
-    setEditFormData({ ...newProd });
+    setNewForm(EMPTY_PROD);
+    setShowAddModal(true);
+  };
+
+  const handleAddSubmit = () => {
+    if (!newForm.name.trim()) return;
+    let price = newForm.price;
+    if (price && !price.startsWith('$')) price = '$' + price;
+    setProducts([{ id: Date.now(), ...newForm, price }, ...products]);
+    setShowAddModal(false);
   };
 
   const handleSave = () => {
@@ -52,25 +63,25 @@ export default function ProductsView({ products, setProducts }: { products: Prod
       <div className="dashboard-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-          <h1>Productos y Stock</h1>
+          <h1>{t("prod_title", "Productos y Stock")}</h1>
         </div>
-        <p>Monitoriza los precios y el inventario de tus productos o servicios.</p>
+        <p>{t("prod_desc", "Monitoriza los precios y el inventario de tus productos o servicios.")}</p>
       </div>
 
       <div className="table-container">
         <div className="table-header">
-          <h2>Inventario Actual</h2>
-          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>+ Nuevo Producto</button>
+          <h2>{t("prod_list_title", "Inventario Actual")}</h2>
+          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>{t("prod_btn_new", "+ Nuevo Producto")}</button>
         </div>
         <table className="data-table">
           <thead>
             <tr>
-              <th>Nombre del Producto/Servicio</th>
-              <th>Categoría</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Estado</th>
-              <th style={{ width: '80px', textAlign: 'center' }}>Acciones</th>
+              <th>{t("prod_col_name", "Nombre del Producto/Servicio")}</th>
+              <th>{t("prod_col_category", "Categoría")}</th>
+              <th>{t("prod_col_price", "Precio")}</th>
+              <th>{t("prod_col_stock", "Stock")}</th>
+              <th>{t("prod_col_status", "Estado")}</th>
+              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Acciones")}</th>
             </tr>
           </thead>
           <tbody>
@@ -136,16 +147,16 @@ export default function ProductsView({ products, setProducts }: { products: Prod
                       value={editFormData?.status}
                       onChange={e => setEditFormData({...editFormData!, status: e.target.value})}
                     >
-                      <option value="Normal">Normal</option>
-                      <option value="Bajo">Bajo</option>
-                      <option value="Agotado">Agotado</option>
+                      <option value="Normal">{t("status_normal", "Normal")}</option>
+                      <option value="Bajo">{t("status_low", "Bajo")}</option>
+                      <option value="Agotado">{t("status_out", "Agotado")}</option>
                     </select>
                   ) : (
                     <span className={`badge ${
-                      prod.status === 'Normal' ? 'badge-success' : 
+                      prod.status === 'Normal' ? 'badge-success' :
                       prod.status === 'Bajo' ? 'badge-warning' : 'badge-error'
                     }`}>
-                      {prod.status}
+                      {prod.status === 'Normal' ? t('status_normal', 'Normal') : prod.status === 'Bajo' ? t('status_low', 'Bajo') : t('status_out', 'Agotado')}
                     </span>
                   )}
                 </td>
@@ -154,7 +165,7 @@ export default function ProductsView({ products, setProducts }: { products: Prod
                     <button 
                       className="btn-action" 
                       onClick={handleSave}
-                      title="Guardar"
+                      title={t("btn_save", "Guardar")}
                       style={{ cursor: 'pointer', color: 'var(--success)', borderColor: 'var(--success)' }}
                     >
                       <SaveIcon />
@@ -163,7 +174,7 @@ export default function ProductsView({ products, setProducts }: { products: Prod
                     <button 
                       className="btn-action" 
                       onClick={() => handleEditClick(prod)}
-                      title="Editar producto"
+                      title={t("prod_btn_edit", "Editar producto")}
                       style={{ cursor: 'pointer' }}
                     >
                       <EditIcon />
@@ -175,6 +186,87 @@ export default function ProductsView({ products, setProducts }: { products: Prod
           </tbody>
         </table>
       </div>
+
+      {showAddModal && (
+        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{t("prod_btn_new", "+ Nuevo Producto")}</h2>
+              <button className="btn-close" onClick={() => setShowAddModal(false)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>{t("prod_col_name", "Nombre del Producto/Servicio")}</label>
+                <input
+                  className="form-input"
+                  value={newForm.name}
+                  onChange={e => setNewForm({ ...newForm, name: e.target.value })}
+                  placeholder={t("prod_col_name", "Nombre del Producto/Servicio")}
+                  autoFocus
+                />
+              </div>
+              <div className="form-group">
+                <label>{t("prod_col_category", "Categoría")}</label>
+                <input
+                  className="form-input"
+                  value={newForm.category}
+                  onChange={e => setNewForm({ ...newForm, category: e.target.value })}
+                  placeholder={t("prod_col_category", "Categoría")}
+                />
+              </div>
+              <div className="form-group">
+                <label>{t("prod_col_price", "Precio")}</label>
+                <input
+                  className="form-input"
+                  value={newForm.price}
+                  onChange={e => setNewForm({ ...newForm, price: e.target.value })}
+                  placeholder="$0.00"
+                />
+              </div>
+              <div className="form-group">
+                <label>{t("prod_col_stock", "Stock")}</label>
+                <input
+                  className="form-input"
+                  value={newForm.stock}
+                  onChange={e => setNewForm({ ...newForm, stock: e.target.value })}
+                  placeholder={t("prod_col_stock", "Stock")}
+                />
+              </div>
+              <div className="form-group">
+                <label>{t("prod_col_status", "Estado")}</label>
+                <select
+                  className="form-input"
+                  value={newForm.status}
+                  onChange={e => setNewForm({ ...newForm, status: e.target.value })}
+                >
+                  <option value="Normal">{t("status_normal", "Normal")}</option>
+                  <option value="Bajo">{t("status_low", "Bajo")}</option>
+                  <option value="Agotado">{t("status_out", "Agotado")}</option>
+                </select>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-primary"
+                style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+                onClick={() => setShowAddModal(false)}
+              >
+                {t("btn_cancel", "Cancelar")}
+              </button>
+              <button
+                className="btn-primary"
+                style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
+                onClick={handleAddSubmit}
+                disabled={!newForm.name.trim()}
+              >
+                {t("btn_save", "Guardar")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
