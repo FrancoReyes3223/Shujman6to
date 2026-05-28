@@ -67,8 +67,8 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
           </button>
         </div>
         {isOpen && (
-          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "0.5rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {userFullName ? `Hola, ${userFullName}` : "Cargando perfil..."}
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {userFullName ? t("greeting_user", "Hola, {{name}}", { name: userFullName }) : t("loading_profile", "Cargando perfil...")}
           </p>
         )}
       </div>
