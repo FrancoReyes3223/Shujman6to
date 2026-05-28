@@ -10,10 +10,11 @@ export default function DashboardPage() {
   const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
 
   useEffect(() => {
-    const token = getCookie("token");
-    if (!token) {
-      router.replace("/");
-      return;
+    function getCookie(name: string) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
     }
 
     const token = getCookie("token");

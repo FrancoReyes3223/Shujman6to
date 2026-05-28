@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../lib/api";
 
 export default function RegisterPage() {
   const { t } = useTranslation();
