@@ -201,7 +201,9 @@ if (!i18n.isInitialized) {
     },
     lng: "es",
     fallbackLng: "en",
+    initImmediate: false,
     interpolation: { escapeValue: false },
+    react: { useSuspense: false },
   });
 }
 
