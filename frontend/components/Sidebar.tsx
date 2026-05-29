@@ -32,19 +32,19 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
   const { t } = useTranslation();
 
   const accountItems = [
-    { id: "cuenta",       label: t("sidebar_account", "Cuenta"),      icon: Icons.account,    comingSoon: true },
-    { id: "seguridad",    label: t("sidebar_security", "Seguridad"),   icon: Icons.security,   comingSoon: true },
+    { id: "cuenta",       label: t("sidebar_account", "Account"),      icon: Icons.account,    comingSoon: true },
+    { id: "seguridad",    label: t("sidebar_security", "Security"),    icon: Icons.security,   comingSoon: true },
     { id: "workspaces",   label: t("sidebar_workspaces", "Workspaces"), icon: Icons.workspaces, comingSoon: true },
   ];
 
   const workspaceItems = [
-    { id: "ws-general",  label: t("sidebar_general", "General"),      icon: Icons.general,   comingSoon: true },
-    { id: "ws-profile",  label: t("sidebar_my_profile", "Mi perfil"), icon: Icons.profile,   comingSoon: true },
-    { id: "ws-company",  label: t("sidebar_company", "Empresa"),      icon: Icons.company,   comingSoon: true },
-    { id: "ws-members",  label: t("sidebar_members", "Miembros"),     icon: Icons.members,   comingSoon: true },
-    { id: "overview",    label: t("sidebar_overview", "Resumen"),     icon: Icons.overview,  comingSoon: false },
-    { id: "employees",   label: t("sidebar_employees", "Empleados"),  icon: Icons.employees, comingSoon: false },
-    { id: "products",    label: t("sidebar_products", "Productos"),   icon: Icons.products,  comingSoon: false },
+    { id: "ws-general",  label: t("sidebar_general", "General"),       icon: Icons.general,   comingSoon: true },
+    { id: "ws-profile",  label: t("sidebar_my_profile", "My Profile"), icon: Icons.profile,   comingSoon: true },
+    { id: "ws-company",  label: t("sidebar_company", "Company"),       icon: Icons.company,   comingSoon: true },
+    { id: "ws-members",  label: t("sidebar_members", "Members"),       icon: Icons.members,   comingSoon: true },
+    { id: "overview",    label: t("sidebar_overview", "Overview"),     icon: Icons.overview,  comingSoon: false },
+    { id: "employees",   label: t("sidebar_employees", "Employees"),   icon: Icons.employees, comingSoon: false },
+    { id: "products",    label: t("sidebar_products", "Products"),     icon: Icons.products,  comingSoon: false },
   ];
 
   function handleNavClick(id: string, comingSoon: boolean) {
@@ -68,14 +68,14 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
         </div>
         {isOpen && (
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {userFullName ? t("greeting_user", "Hola, {{name}}", { name: userFullName }) : t("loading_profile", "Cargando perfil...")}
+            {userFullName ? t("greeting_user", "Hello, {{name}}", { name: userFullName }) : t("loading_profile", "Loading profile...")}
           </p>
         )}
       </div>
 
       {/* Tu cuenta */}
       <div className="sidebar-section">
-        {isOpen && <p className="sidebar-section-label">{t("sidebar_your_account", "Tu cuenta")}</p>}
+        {isOpen && <p className="sidebar-section-label">{t("sidebar_your_account", "Your Account")}</p>}
         <nav className="sidebar-nav">
           {accountItems.map((item) => (
             <NavItem key={item.id} item={item} activeTab={activeTab} isOpen={isOpen} onClick={handleNavClick} />
@@ -99,10 +99,10 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
           className="nav-item"
           onClick={onLogout}
           style={{ color: "var(--error)" }}
-          title={!isOpen ? t("logout", "Cerrar Sesión") : undefined}
+          title={!isOpen ? t("logout", "Log out") : undefined}
         >
           <span className="icon">{Icons.logout}</span>
-          {isOpen && <span className="label">{t("logout", "Cerrar Sesión")}</span>}
+          {isOpen && <span className="label">{t("logout", "Log out")}</span>}
         </button>
       </div>
 

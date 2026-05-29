@@ -2,9 +2,11 @@
 
 import { useTheme } from "./ThemeProvider";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       className="theme-toggle-btn"
-      aria-label="Toggle dark mode"
+      aria-label={t("aria_toggle_dark_mode", "Toggle dark mode")}
       style={{
         display: "flex",
         alignItems: "center",

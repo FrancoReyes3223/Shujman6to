@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next";
 export type Employee = { id: number; name: string; role: string; department: string; status: string };
 
 export const INITIAL_EMPLOYEES: Employee[] = [
-  { id: 1, name: "Carlos Rodríguez", role: "Gerente de Ventas", department: "Comercial", status: "Activo" },
-  { id: 2, name: "Laura Gómez", role: "Especialista en Marketing", department: "Marketing", status: "Activo" },
-  { id: 3, name: "Martín Silva", role: "Desarrollador Frontend", department: "IT", status: "Vacaciones" },
-  { id: 4, name: "Ana Martínez", role: "Analista de RRHH", department: "Recursos Humanos", status: "Activo" },
-  { id: 5, name: "Pedro Sánchez", role: "Soporte Técnico", department: "IT", status: "Inactivo" },
+  { id: 1, name: "Carlos Rodríguez", role: "Gerente de Ventas", department: "Comercial", status: "Active" },
+  { id: 2, name: "Laura Gómez", role: "Especialista en Marketing", department: "Marketing", status: "Active" },
+  { id: 3, name: "Martín Silva", role: "Desarrollador Frontend", department: "IT", status: "On Vacation" },
+  { id: 4, name: "Ana Martínez", role: "Analista de RRHH", department: "Recursos Humanos", status: "Active" },
+  { id: 5, name: "Pedro Sánchez", role: "Soporte Técnico", department: "IT", status: "Inactive" },
 ];
 
 const EditIcon = () => (
@@ -29,7 +29,7 @@ const TrashIcon = () => (
   </svg>
 );
 
-const EMPTY_EMP = { name: "", role: "", department: "", status: "Activo" };
+const EMPTY_EMP = { name: "", role: "", department: "", status: "Active" };
 
 type EmpForm = Omit<Employee, "id">;
 
@@ -56,43 +56,43 @@ function EmpModal({
         </div>
         <div className="modal-body">
           <div className="form-group">
-            <label>{t("emp_col_name", "Nombre")}</label>
+            <label>{t("emp_col_name", "Name")}</label>
             <input
               className="form-input"
               value={form.name}
               onChange={e => onChange({ ...form, name: e.target.value })}
-              placeholder={t("emp_col_name", "Nombre")}
+              placeholder={t("emp_col_name", "Name")}
               autoFocus
             />
           </div>
           <div className="form-group">
-            <label>{t("emp_col_role", "Cargo")}</label>
+            <label>{t("emp_col_role", "Role")}</label>
             <input
               className="form-input"
               value={form.role}
               onChange={e => onChange({ ...form, role: e.target.value })}
-              placeholder={t("emp_col_role", "Cargo")}
+              placeholder={t("emp_col_role", "Role")}
             />
           </div>
           <div className="form-group">
-            <label>{t("emp_col_dept", "Departamento")}</label>
+            <label>{t("emp_col_dept", "Department")}</label>
             <input
               className="form-input"
               value={form.department}
               onChange={e => onChange({ ...form, department: e.target.value })}
-              placeholder={t("emp_col_dept", "Departamento")}
+              placeholder={t("emp_col_dept", "Department")}
             />
           </div>
           <div className="form-group">
-            <label>{t("emp_col_status", "Estado")}</label>
+            <label>{t("emp_col_status", "Status")}</label>
             <select
               className="form-input"
               value={form.status}
               onChange={e => onChange({ ...form, status: e.target.value })}
             >
-              <option value="Activo">{t("status_active", "Activo")}</option>
-              <option value="Vacaciones">{t("status_vacation", "Vacaciones")}</option>
-              <option value="Inactivo">{t("status_inactive", "Inactivo")}</option>
+              <option value="Active">{t("status_active", "Active")}</option>
+              <option value="On Vacation">{t("status_vacation", "On Vacation")}</option>
+              <option value="Inactive">{t("status_inactive", "Inactive")}</option>
             </select>
           </div>
         </div>
@@ -102,7 +102,7 @@ function EmpModal({
             style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
             onClick={onClose}
           >
-            {t("btn_cancel", "Cancelar")}
+            {t("btn_cancel", "Cancel")}
           </button>
           <button
             className="btn-primary"
@@ -110,7 +110,7 @@ function EmpModal({
             onClick={onSubmit}
             disabled={!form.name.trim()}
           >
-            {t("btn_save", "Guardar")}
+            {t("btn_save", "Save")}
           </button>
         </div>
       </div>
@@ -162,26 +162,26 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
       <div className="dashboard-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <h1>{t("emp_title", "Directorio de Empleados")}</h1>
+          <h1>{t("emp_title", "Employee Directory")}</h1>
         </div>
-        <p>{t("emp_desc", "Gestiona la información y estado de tu equipo.")}</p>
+        <p>{t("emp_desc", "Manage your team's information and status.")}</p>
       </div>
 
       <div className="table-container">
         <div className="table-header">
-          <h2>{t("emp_list_title", "Lista de Personal")}</h2>
+          <h2>{t("emp_list_title", "Staff List")}</h2>
           <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
-            {t("emp_btn_new", "+ Nuevo Empleado")}
+            {t("emp_btn_new", "+ New Employee")}
           </button>
         </div>
         <table className="data-table">
           <thead>
             <tr>
-              <th>{t("emp_col_name", "Nombre")}</th>
-              <th>{t("emp_col_role", "Cargo")}</th>
-              <th>{t("emp_col_dept", "Departamento")}</th>
-              <th>{t("emp_col_status", "Estado")}</th>
-              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Acciones")}</th>
+              <th>{t("emp_col_name", "Name")}</th>
+              <th>{t("emp_col_role", "Role")}</th>
+              <th>{t("emp_col_dept", "Department")}</th>
+              <th>{t("emp_col_status", "Status")}</th>
+              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -192,17 +192,17 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
                 <td>{emp.department}</td>
                 <td>
                   <span className={`badge ${
-                    emp.status === 'Activo' ? 'badge-success' :
-                    emp.status === 'Vacaciones' ? 'badge-warning' : 'badge-error'
+                    emp.status === 'Active' ? 'badge-success' :
+                    emp.status === 'On Vacation' ? 'badge-warning' : 'badge-error'
                   }`}>
-                    {emp.status === 'Activo' ? t('status_active', 'Activo') : emp.status === 'Vacaciones' ? t('status_vacation', 'Vacaciones') : t('status_inactive', 'Inactivo')}
+                    {emp.status === 'Active' ? t('status_active', 'Active') : emp.status === 'On Vacation' ? t('status_vacation', 'On Vacation') : t('status_inactive', 'Inactive')}
                   </span>
                 </td>
                 <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                   <button
                     className="btn-action"
                     onClick={() => handleEditClick(emp)}
-                    title={t("emp_btn_edit", "Editar empleado")}
+                    title={t("emp_btn_edit", "Edit employee")}
                     style={{ cursor: 'pointer' }}
                   >
                     <EditIcon />
@@ -210,7 +210,7 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
                   <button
                     className="btn-action"
                     onClick={() => setDeleteTarget(emp)}
-                    title={t("btn_delete", "Eliminar")}
+                    title={t("btn_delete", "Delete")}
                     style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
                   >
                     <TrashIcon />
@@ -224,7 +224,7 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
 
       {showAddModal && (
         <EmpModal
-          title={t("emp_btn_new", "+ Nuevo Empleado")}
+          title={t("emp_btn_new", "+ New Employee")}
           form={addForm}
           onChange={setAddForm}
           onClose={() => setShowAddModal(false)}
@@ -234,7 +234,7 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
 
       {editTarget && (
         <EmpModal
-          title={t("emp_btn_edit", "Editar empleado")}
+          title={t("emp_btn_edit", "Edit employee")}
           form={editForm}
           onChange={setEditForm}
           onClose={() => setEditTarget(null)}
@@ -246,12 +246,12 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
         <div className="modal-overlay" onClick={() => setDeleteTarget(null)}>
           <div className="modal-content" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{t("delete_confirm_title", "Confirmar eliminación")}</h2>
+              <h2>{t("delete_confirm_title", "Confirm Deletion")}</h2>
               <button className="btn-close" onClick={() => setDeleteTarget(null)}><CloseIcon /></button>
             </div>
             <div className="modal-body">
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {t("emp_delete_confirm", "¿Estás seguro de que querés eliminar a {{name}}? Esta acción no se puede deshacer.", { name: deleteTarget.name })}
+                {t("emp_delete_confirm", "Are you sure you want to delete {{name}}? This action cannot be undone.", { name: deleteTarget.name })}
               </p>
             </div>
             <div className="modal-footer">
@@ -260,14 +260,14 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
                 style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
                 onClick={() => setDeleteTarget(null)}
               >
-                {t("btn_cancel", "Cancelar")}
+                {t("btn_cancel", "Cancel")}
               </button>
               <button
                 className="btn-primary"
                 style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem', background: 'var(--error)', boxShadow: 'none' }}
                 onClick={handleDeleteConfirm}
               >
-                {t("btn_delete", "Eliminar")}
+                {t("btn_delete", "Delete")}
               </button>
             </div>
           </div>

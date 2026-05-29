@@ -6,9 +6,9 @@ export type Product = { id: number; name: string; category: string; price: strin
 export const INITIAL_PRODUCTS: Product[] = [
   { id: 1, name: "Licencia Software Básico", category: "Servicios", price: "$150.00", stock: "Ilimitado", status: "Normal" },
   { id: 2, name: "Licencia Software Pro", category: "Servicios", price: "$300.00", stock: "Ilimitado", status: "Normal" },
-  { id: 3, name: "Servidor Dedicado Tipo A", category: "Hardware", price: "$1,200.00", stock: "5", status: "Bajo" },
+  { id: 3, name: "Servidor Dedicado Tipo A", category: "Hardware", price: "$1,200.00", stock: "5", status: "Low" },
   { id: 4, name: "Soporte Técnico Premium 1 Año", category: "Servicios", price: "$500.00", stock: "Ilimitado", status: "Normal" },
-  { id: 5, name: "Router Empresarial", category: "Hardware", price: "$250.00", stock: "0", status: "Agotado" },
+  { id: 5, name: "Router Empresarial", category: "Hardware", price: "$250.00", stock: "0", status: "Out of Stock" },
 ];
 
 const EditIcon = () => (
@@ -60,26 +60,26 @@ function ProdModal({
         </div>
         <div className="modal-body">
           <div className="form-group">
-            <label>{t("prod_col_name", "Nombre del Producto/Servicio")}</label>
+            <label>{t("prod_col_name", "Product/Service Name")}</label>
             <input
               className="form-input"
               value={form.name}
               onChange={e => onChange({ ...form, name: e.target.value })}
-              placeholder={t("prod_col_name", "Nombre del Producto/Servicio")}
+              placeholder={t("prod_col_name", "Product/Service Name")}
               autoFocus
             />
           </div>
           <div className="form-group">
-            <label>{t("prod_col_category", "Categoría")}</label>
+            <label>{t("prod_col_category", "Category")}</label>
             <input
               className="form-input"
               value={form.category}
               onChange={e => onChange({ ...form, category: e.target.value })}
-              placeholder={t("prod_col_category", "Categoría")}
+              placeholder={t("prod_col_category", "Category")}
             />
           </div>
           <div className="form-group">
-            <label>{t("prod_col_price", "Precio")}</label>
+            <label>{t("prod_col_price", "Price")}</label>
             <input
               className="form-input"
               value={form.price}
@@ -97,15 +97,15 @@ function ProdModal({
             />
           </div>
           <div className="form-group">
-            <label>{t("prod_col_status", "Estado")}</label>
+            <label>{t("prod_col_status", "Status")}</label>
             <select
               className="form-input"
               value={form.status}
               onChange={e => onChange({ ...form, status: e.target.value })}
             >
               <option value="Normal">{t("status_normal", "Normal")}</option>
-              <option value="Bajo">{t("status_low", "Bajo")}</option>
-              <option value="Agotado">{t("status_out", "Agotado")}</option>
+              <option value="Low">{t("status_low", "Low")}</option>
+              <option value="Out of Stock">{t("status_out", "Out of Stock")}</option>
             </select>
           </div>
         </div>
@@ -115,7 +115,7 @@ function ProdModal({
             style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
             onClick={onClose}
           >
-            {t("btn_cancel", "Cancelar")}
+            {t("btn_cancel", "Cancel")}
           </button>
           <button
             className="btn-primary"
@@ -123,7 +123,7 @@ function ProdModal({
             onClick={onSubmit}
             disabled={!form.name.trim()}
           >
-            {t("btn_save", "Guardar")}
+            {t("btn_save", "Save")}
           </button>
         </div>
       </div>
@@ -175,27 +175,27 @@ export default function ProductsView({ products, setProducts }: { products: Prod
       <div className="dashboard-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-          <h1>{t("prod_title", "Productos y Stock")}</h1>
+          <h1>{t("prod_title", "Products & Stock")}</h1>
         </div>
-        <p>{t("prod_desc", "Monitoriza los precios y el inventario de tus productos o servicios.")}</p>
+        <p>{t("prod_desc", "Monitor prices and inventory of your products or services.")}</p>
       </div>
 
       <div className="table-container">
         <div className="table-header">
-          <h2>{t("prod_list_title", "Inventario Actual")}</h2>
+          <h2>{t("prod_list_title", "Current Inventory")}</h2>
           <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
-            {t("prod_btn_new", "+ Nuevo Producto")}
+            {t("prod_btn_new", "+ New Product")}
           </button>
         </div>
         <table className="data-table">
           <thead>
             <tr>
-              <th>{t("prod_col_name", "Nombre del Producto/Servicio")}</th>
-              <th>{t("prod_col_category", "Categoría")}</th>
-              <th>{t("prod_col_price", "Precio")}</th>
+              <th>{t("prod_col_name", "Product/Service Name")}</th>
+              <th>{t("prod_col_category", "Category")}</th>
+              <th>{t("prod_col_price", "Price")}</th>
               <th>{t("prod_col_stock", "Stock")}</th>
-              <th>{t("prod_col_status", "Estado")}</th>
-              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Acciones")}</th>
+              <th>{t("prod_col_status", "Status")}</th>
+              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -208,16 +208,16 @@ export default function ProductsView({ products, setProducts }: { products: Prod
                 <td>
                   <span className={`badge ${
                     prod.status === 'Normal' ? 'badge-success' :
-                    prod.status === 'Bajo' ? 'badge-warning' : 'badge-error'
+                    prod.status === 'Low' ? 'badge-warning' : 'badge-error'
                   }`}>
-                    {prod.status === 'Normal' ? t('status_normal', 'Normal') : prod.status === 'Bajo' ? t('status_low', 'Bajo') : t('status_out', 'Agotado')}
+                    {prod.status === 'Normal' ? t('status_normal', 'Normal') : prod.status === 'Low' ? t('status_low', 'Low') : t('status_out', 'Out of Stock')}
                   </span>
                 </td>
                 <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                   <button
                     className="btn-action"
                     onClick={() => handleEditClick(prod)}
-                    title={t("prod_btn_edit", "Editar producto")}
+                    title={t("prod_btn_edit", "Edit product")}
                     style={{ cursor: 'pointer' }}
                   >
                     <EditIcon />
@@ -225,7 +225,7 @@ export default function ProductsView({ products, setProducts }: { products: Prod
                   <button
                     className="btn-action"
                     onClick={() => setDeleteTarget(prod)}
-                    title={t("btn_delete", "Eliminar")}
+                    title={t("btn_delete", "Delete")}
                     style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
                   >
                     <TrashIcon />
@@ -239,7 +239,7 @@ export default function ProductsView({ products, setProducts }: { products: Prod
 
       {showAddModal && (
         <ProdModal
-          title={t("prod_btn_new", "+ Nuevo Producto")}
+          title={t("prod_btn_new", "+ New Product")}
           form={addForm}
           onChange={setAddForm}
           onClose={() => setShowAddModal(false)}
@@ -249,7 +249,7 @@ export default function ProductsView({ products, setProducts }: { products: Prod
 
       {editTarget && (
         <ProdModal
-          title={t("prod_btn_edit", "Editar producto")}
+          title={t("prod_btn_edit", "Edit product")}
           form={editForm}
           onChange={setEditForm}
           onClose={() => setEditTarget(null)}
@@ -261,12 +261,12 @@ export default function ProductsView({ products, setProducts }: { products: Prod
         <div className="modal-overlay" onClick={() => setDeleteTarget(null)}>
           <div className="modal-content" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{t("delete_confirm_title", "Confirmar eliminación")}</h2>
+              <h2>{t("delete_confirm_title", "Confirm Deletion")}</h2>
               <button className="btn-close" onClick={() => setDeleteTarget(null)}><CloseIcon /></button>
             </div>
             <div className="modal-body">
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {t("prod_delete_confirm", "¿Estás seguro de que querés eliminar {{name}}? Esta acción no se puede deshacer.", { name: deleteTarget.name })}
+                {t("prod_delete_confirm", "Are you sure you want to delete {{name}}? This action cannot be undone.", { name: deleteTarget.name })}
               </p>
             </div>
             <div className="modal-footer">
@@ -275,14 +275,14 @@ export default function ProductsView({ products, setProducts }: { products: Prod
                 style={{ background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
                 onClick={() => setDeleteTarget(null)}
               >
-                {t("btn_cancel", "Cancelar")}
+                {t("btn_cancel", "Cancel")}
               </button>
               <button
                 className="btn-primary"
                 style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem', background: 'var(--error)', boxShadow: 'none' }}
                 onClick={handleDeleteConfirm}
               >
-                {t("btn_delete", "Eliminar")}
+                {t("btn_delete", "Delete")}
               </button>
             </div>
           </div>
