@@ -39,9 +39,17 @@ const en = {
   signing_in: "Signing in...",
   welcome_message: "Welcome, {{name}}! You have successfully signed in.",
   // Sidebar
+  sidebar_your_account: "Your Account",
+  sidebar_account: "Account",
+  sidebar_security: "Security",
+  sidebar_workspaces: "Workspaces",
+  sidebar_general: "General",
+  sidebar_my_profile: "My Profile",
+  sidebar_company: "Company",
+  sidebar_members: "Members",
   sidebar_overview: "Overview",
   sidebar_employees: "Employees",
-  sidebar_products: "Products & Stock",
+  sidebar_products: "Products",
   greeting_user: "Hello, {{name}}",
   // Overview
   overview_title: "General Overview",
@@ -78,8 +86,10 @@ const en = {
   status_normal: "Normal",
   status_low: "Low",
   status_out: "Out of Stock",
+  // ThemeToggle
+  aria_toggle_dark_mode: "Toggle dark mode",
   // Footer
-  docs_button: "View documentation",
+  docs_button: "View Documentation",
   btn_cancel: "Cancel",
   btn_delete: "Delete",
   delete_confirm_title: "Confirm deletion",
@@ -125,9 +135,17 @@ const es = {
   signing_in: "Ingresando...",
   welcome_message: "¡Bienvenido, {{name}}! Has iniciado sesión correctamente.",
   // Sidebar
-  sidebar_overview: "Resumen General",
+  sidebar_your_account: "Tu cuenta",
+  sidebar_account: "Cuenta",
+  sidebar_security: "Seguridad",
+  sidebar_workspaces: "Workspaces",
+  sidebar_general: "General",
+  sidebar_my_profile: "Mi perfil",
+  sidebar_company: "Empresa",
+  sidebar_members: "Miembros",
+  sidebar_overview: "Resumen",
   sidebar_employees: "Empleados",
-  sidebar_products: "Productos y Stock",
+  sidebar_products: "Productos",
   greeting_user: "Hola, {{name}}",
   // Overview
   overview_title: "Resumen General",
@@ -164,6 +182,8 @@ const es = {
   status_normal: "Normal",
   status_low: "Bajo",
   status_out: "Agotado",
+  // ThemeToggle
+  aria_toggle_dark_mode: "Alternar modo oscuro",
   // Footer
   docs_button: "Ver documentación",
   btn_cancel: "Cancelar",
