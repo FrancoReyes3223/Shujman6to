@@ -4,6 +4,7 @@ import "./globals.css";
 import I18nProvider from "../components/I18nProvider";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { WorkspaceProvider } from "../components/WorkspaceProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,8 +49,10 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <I18nProvider>
-            <LanguageSwitcher />
-            {children}
+            <WorkspaceProvider>
+              <LanguageSwitcher />
+              {children}
+            </WorkspaceProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>
