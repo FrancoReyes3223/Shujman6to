@@ -1,120 +1,68 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import Sidebar from "../../components/Sidebar";
-import OverviewView from "../../components/OverviewView";
-import EmployeesView, { INITIAL_EMPLOYEES } from "../../components/EmployeesView";
-import ProductsView, { INITIAL_PRODUCTS } from "../../components/ProductsView";
+import React from 'react'
+import { useWorkspace } from '../../components/WorkspaceProvider'
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { activeWorkspace, isLoading } = useWorkspace()
 
-  const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '16rem' }}>
+        <span className="spinner" style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--accent)' }} />
+        <p style={{ color: 'var(--text-muted)', marginLeft: '0.75rem' }}>Cargando...</p>
+      </div>
+    )
+  }
 
-  useEffect(() => {
-    function getCookie(name: string) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift();
-      return null;
-    }
-
-    const token = getCookie("token");
-    if (!token) {
-      router.replace("/");
-      return;
-    }
-
-    async function fetchProfile() {
-      try {
-        const res = await fetch("http://localhost:3001/api/v1/usuarios/perfil", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
-        const data = await res.json();
-        if (data.success) {
-          setUser(data.data);
-        } else {
-          document.cookie = "token=; path=/; max-age=0";
-          router.replace("/");
-        }
-      } catch {
-        document.cookie = "token=; path=/; max-age=0";
-        router.replace("/");
-      }
-    }
-
-    fetchProfile();
-  }, [router]);
-
-  function handleLogout() {
-    document.cookie = "token=; path=/; max-age=0";
-    router.push("/");
+  if (!activeWorkspace) {
+    return (
+      <div className="metric-card" style={{ textAlign: 'center', padding: '3rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>¡Bienvenido!</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+          Para empezar, necesitas seleccionar o crear una empresa.
+        </p>
+        <a href="/workspaces/create" className="btn-primary" style={{ display: 'inline-block', width: 'auto', padding: '0.75rem 2rem' }}>
+          + Crear Empresa
+        </a>
+      </div>
+    )
   }
 
   return (
-    <div className="dashboard-layout">
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        onLogout={handleLogout} 
-        userFullName={user?.fullName}
-        isOpen={isSidebarOpen}
-        setIsOpen={setIsSidebarOpen}
-      />
-      
-      <main className="dashboard-main">
+    <div>
+      <div className="dashboard-header">
+        <h1>Resumen — {activeWorkspace.name}</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+          Tu rol: <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{activeWorkspace.role}</span>
+        </p>
+      </div>
 
-        <div style={{ display: activeTab === "overview" ? "block" : "none" }}>
-          <OverviewView employees={employees} products={products} />
-        </div>
-        <div style={{ display: activeTab === "employees" ? "block" : "none" }}>
-          <EmployeesView employees={employees} setEmployees={setEmployees} />
-        </div>
-        <div style={{ display: activeTab === "products" ? "block" : "none" }}>
-          <ProductsView products={products} setProducts={setProducts} />
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <h3>Inventario</h3>
+          <p className="value">Productos</p>
+          <a href="/dashboard/products" style={{ color: 'var(--accent)', fontSize: '0.85rem', marginTop: '0.75rem', display: 'inline-block' }}>
+            Ver inventario →
+          </a>
         </div>
 
-        <footer style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border-color)', marginTop: 'auto', display: 'flex', justifyContent: 'center' }}>
-          <Link
-            href="/docs"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1.25rem',
-              borderRadius: '0.5rem',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-secondary)',
-              fontSize: '0.875rem',
-              textDecoration: 'none',
-              transition: 'background 0.15s, border-color 0.15s',
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'var(--bg-secondary)';
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--accent)';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLAnchorElement).style.background = '';
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border-color)';
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
-            {t("docs_button", "View Documentation")}
-          </Link>
-        </footer>
-      </main>
+        <div className="metric-card">
+          <h3>Finanzas</h3>
+          <p className="value">Flujo de caja</p>
+          <a href="/dashboard/transactions" style={{ color: 'var(--accent)', fontSize: '0.85rem', marginTop: '0.75rem', display: 'inline-block' }}>
+            Ver movimientos →
+          </a>
+        </div>
+
+        <div className="metric-card">
+          <h3>Equipo</h3>
+          <p className="value">Personal</p>
+          <a href="/dashboard/employees" style={{ color: 'var(--accent)', fontSize: '0.85rem', marginTop: '0.75rem', display: 'inline-block' }}>
+            Ver empleados →
+          </a>
+        </div>
+      </div>
     </div>
-  );
+  )
 }

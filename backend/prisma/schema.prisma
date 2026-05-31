@@ -14,6 +14,86 @@ model User {
   password  String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  workspaces WorkspaceMember[]
 
   @@map("users")
+}
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  members   WorkspaceMember[]
+  
+  products     Product[]
+  transactions Transaction[]
+  employees    Employee[]
+  
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  workspaceId String    @map("workspace_id")
+  
+  // Roles: "OWNER", "ADMIN", "USER"
+  role        String    @default("USER") 
+  
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  // Un usuario no puede estar agregado dos veces al mismo workspace
+  @@unique([userId, workspaceId])
+  @@map("workspace_members")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  cost        Float?
+  stock       Int      @default(0)
+  
+  workspaceId String   @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  type        String   // "INCOME" o "EXPENSE"
+  amount      Float
+  description String
+  date        DateTime @default(now())
+  
+  workspaceId String   @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("transactions")
+}
+
+model Employee {
+  id          String    @id @default(uuid())
+  fullName    String    @map("full_name")
+  position    String?
+  salary      Float?
+  hireDate    DateTime? @map("hire_date")
+  
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("employees")
 }
