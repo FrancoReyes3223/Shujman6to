@@ -15,11 +15,12 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'Shujman',
+      title: 'SchujmanB2B',
       customCss: ['./src/styles/custom.css'],
       components: {
         ThemeSelect: './src/components/ThemeSelect.astro',
         LanguageSelect: './src/components/LanguageSelect.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
       },
       defaultLocale: 'es',
       locales: {

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../lib/api";
 import Sidebar from "../../components/Sidebar";
 import OverviewView from "../../components/OverviewView";
 import EmployeesView, { INITIAL_EMPLOYEES } from "../../components/EmployeesView";
@@ -35,7 +36,7 @@ export default function DashboardPage() {
 
     async function fetchProfile() {
       try {
-        const res = await fetch("http://localhost:3001/api/v1/usuarios/perfil", {
+        const res = await fetch(`${API_BASE}/usuarios/perfil`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }

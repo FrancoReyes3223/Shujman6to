@@ -1,6 +1,8 @@
-/* Shujman theme — matches the main app's blue palette */
+/* SchujmanB2B theme — matches the main app's blue palette */
 
 :root {
+  --b2b-color: #FFD700;
+
   --sl-color-accent-low:  rgba(74, 144, 217, 0.2);
   --sl-color-accent:      #1e50a0;
   --sl-color-accent-high: #4a90d9;

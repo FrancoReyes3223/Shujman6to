@@ -4,4 +4,4 @@ export const API_BASE =
   typeof window !== "undefined" &&
   window.location.pathname.startsWith("/~")
     ? `/${window.location.pathname.split("/")[1]}/api/v1`
-    : "http://localhost:3001/api/v1";
+    : "http://localhost:3001/v1";

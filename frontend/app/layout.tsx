@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shujman - Login",
+  title: "SchujmanB2B - Login",
   description: "Sistema de autenticación",
 };
 

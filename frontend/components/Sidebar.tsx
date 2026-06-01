@@ -59,7 +59,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
         <div style={{ display: "flex", alignItems: "center", justifyContent: isOpen ? "space-between" : "center", width: "100%" }}>
           {isOpen && (
             <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-primary)" }}>
-              Shujman<span style={{ color: "var(--gold)" }}>B2B</span>
+              Schujman<span style={{ color: "var(--gold)" }}>B2B</span>
             </h2>
           )}
           <button onClick={() => setIsOpen(!isOpen)} className="toggle-btn">

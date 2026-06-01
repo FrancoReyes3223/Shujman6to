@@ -1,25 +1,23 @@
 ---
-title: Shujman — Página de Login
+title: SchujmanB2B — Página de Login
 description: Documentación del proyecto integrador de 6to año.
 template: splash
 hero:
   tagline: Proyecto integrador — Aplicación de login con Next.js, Express y SQLite.
   actions:
     - text: Ver entregas
-      link: ./entregas/entrega-1
+      link: ./entregas/entrega-2
       icon: right-arrow
 ---
 
-## ¿De qué trata el proyecto?
+## Objetivo
 
-Aplicación web completa con autenticación de usuarios. Incluye un frontend en **Next.js**, un backend en **Express** con arquitectura en capas, y una base de datos **SQLite** manejada con Prisma ORM.
+Schujman<span style="color: var(--b2b-color)">**B2B**</span> es una aplicación web de gestión para empleados y productos. Permite a los usuarios autenticarse de forma segura y acceder a un panel de control desde donde pueden administrar el personal y el catálogo de productos de una organización.
 
-## Stack tecnológico
+## ¿Cómo se usa?
 
-| Capa       | Tecnología                  |
-|------------|-----------------------------|
-| Frontend   | Next.js 15 (App Router)     |
-| Backend    | Node.js + Express           |
-| ORM        | Prisma                      |
-| Base datos | SQLite                      |
-| Auth       | JWT + cookies               |
+1. **Iniciar sesión** — ingresá tu email y contraseña en la pantalla de inicio.
+2. **Dashboard** — una vez autenticado, accedés al panel principal con tres secciones: resumen, empleados y productos.
+3. **Gestionar empleados** — desde la pestaña *Empleados* podés ver, agregar y eliminar registros de personal.
+4. **Gestionar productos** — desde la pestaña *Productos* podés ver, agregar y eliminar productos del catálogo.
+5. **Cerrar sesión** — usá el botón de logout en el sidebar para salir de forma segura.

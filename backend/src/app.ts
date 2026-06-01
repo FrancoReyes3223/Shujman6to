@@ -10,14 +10,14 @@ const app = express()
 
 app.use(helmet())
 app.use(cors({
-  origin: /^http:\/\/localhost(:\d+)?$/,
+  origin: [/^http:\/\/localhost(:\d+)?$/, /^http:\/\/200\.3\.127\.46(:\d+)?$/],
   credentials: true
 }))
 app.use(express.json())
 app.use(cookieParser())
 app.use(morgan('dev'))
 
-app.use('/api', routes)
+app.use('/', routes)
 
 app.use(errorHandler)
 
