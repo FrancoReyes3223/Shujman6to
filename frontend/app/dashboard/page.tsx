@@ -111,6 +111,20 @@ export default function DashboardPage() {
           <ProductsView products={products} setProducts={setProducts} />
         </div>
 
+        {!["overview", "employees", "products"].includes(activeTab) && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, color: "var(--text-secondary)", marginTop: "4rem" }}>
+            <div style={{ fontSize: "5rem", animation: "bounce 2s infinite ease-in-out", display: "inline-block" }}>
+              🚧
+            </div>
+            <h2 style={{ marginTop: "1.5rem", fontSize: "1.5rem", fontWeight: 600, color: "var(--foreground)" }}>
+              {t("work_in_progress", "Aún estamos trabajando en esta sección")}
+            </h2>
+            <p style={{ marginTop: "0.5rem", opacity: 0.7 }}>
+              {t("work_in_progress_desc", "Vuelve pronto para ver las novedades.")}
+            </p>
+          </div>
+        )}
+
         <footer style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border-color)', marginTop: 'auto', display: 'flex', justifyContent: 'center' }}>
           <Link
             href="/docs"

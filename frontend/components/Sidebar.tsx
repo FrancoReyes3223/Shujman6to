@@ -48,7 +48,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
   ];
 
   function handleNavClick(id: string, comingSoon: boolean) {
-    if (!comingSoon) setActiveTab(id);
+    setActiveTab(id);
   }
 
   return (
@@ -120,7 +120,7 @@ type NavItemProps = {
 };
 
 function NavItem({ item, activeTab, isOpen, onClick }: NavItemProps) {
-  const isActive = !item.comingSoon && activeTab === item.id;
+  const isActive = activeTab === item.id;
 
   return (
     <button

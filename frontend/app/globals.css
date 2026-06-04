@@ -447,7 +447,7 @@
   color: var(--muted-foreground);
   font-weight: 500;
   font-size: 0.875rem;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid var(--border);
 }
 
@@ -456,6 +456,7 @@
   color: var(--foreground);
   border-bottom: 1px solid var(--border);
   font-size: 0.875rem;
+  text-align: center;
 }
 
 .data-table tbody tr:hover {
@@ -613,4 +614,15 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-15%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
