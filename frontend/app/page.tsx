@@ -70,8 +70,13 @@ export default function LoginPage() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>{t("sign_in", "Sign In")}</h1>
-        <p className="subtitle">{t("sign_in_subtitle", "Enter your credentials to continue")}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '2.5rem', height: '2.5rem', borderRadius: '0.5rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', marginBottom: '1rem' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h1>{t("sign_in", "Sign In")}</h1>
+          <p className="subtitle" style={{ marginBottom: 0 }}>{t("sign_in_subtitle", "Enter your credentials to continue")}</p>
+        </div>
 
         {generalError && <div className="error-banner">{generalError}</div>}
 

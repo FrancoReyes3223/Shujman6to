@@ -17,8 +17,34 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  const [isLoaded, setIsLoaded] = useState(false);
   const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
   const [products, setProducts] = useState(INITIAL_PRODUCTS);
+
+  useEffect(() => {
+    const savedEmployees = localStorage.getItem('shujman_employees');
+    if (savedEmployees) {
+      try { setEmployees(JSON.parse(savedEmployees)); } catch (e) {}
+    }
+    
+    const savedProducts = localStorage.getItem('shujman_products');
+    if (savedProducts) {
+      try { setProducts(JSON.parse(savedProducts)); } catch (e) {}
+    }
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('shujman_employees', JSON.stringify(employees));
+    }
+  }, [employees, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('shujman_products', JSON.stringify(products));
+    }
+  }, [products, isLoaded]);
 
   useEffect(() => {
     function getCookie(name: string) {

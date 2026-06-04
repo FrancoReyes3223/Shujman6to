@@ -55,19 +55,21 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
     <div className={`dashboard-sidebar ${isOpen ? "open" : "closed"}`}>
 
       {/* Header */}
-      <div className="sidebar-header">
+      <div className="sidebar-header" style={{ flexDirection: "column", alignItems: isOpen ? "flex-start" : "center", height: "auto", paddingBottom: "1rem", paddingTop: "1rem", justifyContent: "center" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: isOpen ? "space-between" : "center", width: "100%" }}>
-          {isOpen && (
-            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-primary)" }}>
-              Schujman<span style={{ color: "var(--gold)" }}>B2B</span>
-            </h2>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            {isOpen && (
+              <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "#ffffff" }}>
+                Shujman<span style={{ color: "var(--gold)" }}>B2B</span>
+              </h2>
+            )}
+          </div>
           <button onClick={() => setIsOpen(!isOpen)} className="toggle-btn">
             {Icons.menu}
           </button>
         </div>
         {isOpen && (
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
             {userFullName ? t("greeting_user", "Hello, {{name}}", { name: userFullName }) : t("loading_profile", "Loading profile...")}
           </p>
         )}
@@ -98,7 +100,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
         <button
           className="nav-item"
           onClick={onLogout}
-          style={{ color: "var(--error)" }}
+          style={{ color: "var(--error)", justifyContent: isOpen ? "flex-start" : "center" }}
           title={!isOpen ? t("logout", "Log out") : undefined}
         >
           <span className="icon">{Icons.logout}</span>
@@ -125,6 +127,7 @@ function NavItem({ item, activeTab, isOpen, onClick }: NavItemProps) {
       className={`nav-item ${isActive ? "active" : ""} ${item.comingSoon ? "coming-soon" : ""}`}
       onClick={() => onClick(item.id, item.comingSoon)}
       title={!isOpen ? item.label : undefined}
+      style={{ justifyContent: isOpen ? "flex-start" : "center" }}
     >
       <span className="icon">{item.icon}</span>
       {isOpen && (
