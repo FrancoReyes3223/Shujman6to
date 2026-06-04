@@ -13,7 +13,8 @@ export default function LanguageSwitcher() {
 
   const handleLangChange = (code: string) => {
     document.cookie = `i18next=${code}; path=/; max-age=31536000`;
-    window.location.reload();
+    i18n.changeLanguage(code);
+    document.documentElement.lang = code;
   };
 
   return (
