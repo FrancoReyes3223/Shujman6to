@@ -9,6 +9,8 @@ import Sidebar from "../../components/Sidebar";
 import OverviewView from "../../components/OverviewView";
 import EmployeesView, { INITIAL_EMPLOYEES } from "../../components/EmployeesView";
 import ProductsView, { INITIAL_PRODUCTS } from "../../components/ProductsView";
+import AccountView from "../../components/AccountView";
+import CompanyView from "../../components/CompanyView";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -111,7 +113,14 @@ export default function DashboardPage() {
           <ProductsView products={products} setProducts={setProducts} />
         </div>
 
-        {!["overview", "employees", "products"].includes(activeTab) && (
+        <div style={{ display: activeTab === "cuenta" ? "block" : "none" }}>
+          <AccountView user={user} />
+        </div>
+        <div style={{ display: activeTab === "ws-company" ? "block" : "none" }}>
+          <CompanyView />
+        </div>
+
+        {!["overview", "employees", "products", "cuenta", "ws-company"].includes(activeTab) && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, color: "var(--text-secondary)", marginTop: "4rem" }}>
             <div style={{ fontSize: "5rem", animation: "bounce 2s infinite ease-in-out", display: "inline-block" }}>
               🚧

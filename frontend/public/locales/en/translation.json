@@ -85,5 +85,19 @@
   "status_normal": "Normal",
   "status_out": "Out of Stock",
   "status_vacation": "On Vacation",
-  "welcome_message": "Welcome, {{name}}! You have successfully signed in."
+  "welcome_message": "Welcome, {{name}}! You have successfully signed in.",
+  "work_in_progress": "We are still working on this section",
+  "work_in_progress_desc": "Check back soon for updates.",
+  "account_desc": "Manage your personal information and preferences.",
+  "acc_personal_info": "Personal Information",
+  "acc_preferences": "Preferences",
+  "acc_notif_email": "Email Notifications",
+  "acc_notif_email_desc": "Receive alerts and weekly reports in your inbox.",
+  "acc_marketing": "Marketing Emails",
+  "acc_marketing_desc": "Receive news and special offers.",
+  "acc_public_profile": "Public Profile",
+  "acc_public_profile_desc": "Allow others to see your name and email.",
+  "company_desc": "Information about our organization and its founders.",
+  "company_about_text": "ShujmanB2B is a leading company in enterprise technology solutions. Our goal is to transform the way organizations manage their resources, employees, and products through modern, intuitive, and efficient platforms.",
+  "company_founders": "Founders"
 }

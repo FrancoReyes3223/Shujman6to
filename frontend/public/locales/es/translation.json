@@ -85,5 +85,19 @@
   "status_normal": "Normal",
   "status_out": "Agotado",
   "status_vacation": "Vacaciones",
-  "welcome_message": "¡Bienvenido, {{name}}! Has iniciado sesión correctamente."
+  "welcome_message": "¡Bienvenido, {{name}}! Has iniciado sesión correctamente.",
+  "work_in_progress": "Aún estamos trabajando en esta sección",
+  "work_in_progress_desc": "Vuelve pronto para ver las novedades.",
+  "account_desc": "Gestioná tu información personal y preferencias.",
+  "acc_personal_info": "Información personal",
+  "acc_preferences": "Preferencias",
+  "acc_notif_email": "Notificaciones por correo",
+  "acc_notif_email_desc": "Recibí alertas y reportes semanales en tu correo.",
+  "acc_marketing": "Correos de marketing",
+  "acc_marketing_desc": "Recibí noticias y ofertas especiales.",
+  "acc_public_profile": "Perfil público",
+  "acc_public_profile_desc": "Habilita o deshabilita que otros vean tu nombre y email.",
+  "company_desc": "Información sobre nuestra organización y sus fundadores.",
+  "company_about_text": "ShujmanB2B es una empresa líder en soluciones tecnológicas empresariales. Nuestro objetivo es transformar la manera en que las organizaciones gestionan sus recursos, empleados y productos a través de plataformas modernas, intuitivas y eficientes.",
+  "company_founders": "Fundadores"
 }

@@ -32,15 +32,14 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
   const { t } = useTranslation();
 
   const accountItems = [
-    { id: "cuenta",       label: t("sidebar_account", "Account"),      icon: Icons.account,    comingSoon: true },
+    { id: "cuenta",       label: t("sidebar_account", "Account"),      icon: Icons.account,    comingSoon: false },
     { id: "seguridad",    label: t("sidebar_security", "Security"),    icon: Icons.security,   comingSoon: true },
     { id: "workspaces",   label: t("sidebar_workspaces", "Workspaces"), icon: Icons.workspaces, comingSoon: true },
   ];
 
   const workspaceItems = [
-    { id: "ws-general",  label: t("sidebar_general", "General"),       icon: Icons.general,   comingSoon: true },
     { id: "ws-profile",  label: t("sidebar_my_profile", "My Profile"), icon: Icons.profile,   comingSoon: true },
-    { id: "ws-company",  label: t("sidebar_company", "Company"),       icon: Icons.company,   comingSoon: true },
+    { id: "ws-company",  label: t("sidebar_company", "Company"),       icon: Icons.company,   comingSoon: false },
     { id: "ws-members",  label: t("sidebar_members", "Members"),       icon: Icons.members,   comingSoon: true },
     { id: "overview",    label: t("sidebar_overview", "Overview"),     icon: Icons.overview,  comingSoon: false },
     { id: "employees",   label: t("sidebar_employees", "Employees"),   icon: Icons.employees, comingSoon: false },
