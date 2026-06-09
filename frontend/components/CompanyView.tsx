@@ -303,7 +303,7 @@ export default function CompanyView({ workspaceId, token, readOnly = false }: { 
                               : founder.initials}
                           </div>
                           <h3 style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--foreground)", marginBottom: "0.25rem" }}>{founder.name}</h3>
-                          <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Co-fundador</p>
+                          <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>{t("founder_cofunder", "Co-founder")}</p>
                           <div style={{ width: "2.5rem", height: "3px", background: founder.color, borderRadius: "2px", marginBottom: "1.5rem" }} />
                           {founder.quote && (
                             <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", fontStyle: "italic", lineHeight: 1.7 }}>

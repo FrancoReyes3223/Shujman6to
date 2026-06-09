@@ -32,12 +32,6 @@ const Icons = {
   check:      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  OWNER: "Owner",
-  ADMIN: "Admin",
-  USER:  "Usuario",
-};
-
 const ROLE_COLORS: Record<string, string> = {
   OWNER: "#f59e0b",
   ADMIN: "#6366f1",
@@ -47,6 +41,12 @@ const ROLE_COLORS: Record<string, string> = {
 export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullName, isOpen, setIsOpen }: SidebarProps) {
   const { t } = useTranslation();
   const { workspaces, activeWorkspace, setActiveWorkspace } = useWorkspace();
+
+  const roleLabels: Record<string, string> = {
+    OWNER: t("role_owner", "Owner"),
+    ADMIN: t("role_admin", "Admin"),
+    USER:  t("role_user", "User"),
+  };
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -139,7 +139,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
               >
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.2rem", overflow: "hidden" }}>
                   <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    Workspace
+                    {t("label_workspace", "Workspace")}
                   </span>
                   <span style={{ fontSize: "0.9rem", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "140px" }}>
                     {activeWorkspace ? activeWorkspace.name : t("no_workspace", "Sin empresa")}
@@ -148,7 +148,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.25rem", flexShrink: 0 }}>
                   {role && (
                     <span style={{ fontSize: "0.65rem", fontWeight: 700, padding: "0.15rem 0.45rem", borderRadius: "999px", background: `${ROLE_COLORS[role]}22`, color: ROLE_COLORS[role], border: `1px solid ${ROLE_COLORS[role]}55` }}>
-                      {ROLE_LABELS[role]}
+                      {roleLabels[role]}
                     </span>
                   )}
                   <span style={{ color: "var(--text-secondary)", transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", display: "flex" }}>
@@ -200,7 +200,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
                         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ws.name}</span>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
                           <span style={{ fontSize: "0.65rem", fontWeight: 700, padding: "0.1rem 0.4rem", borderRadius: "999px", background: `${ROLE_COLORS[ws.role]}22`, color: ROLE_COLORS[ws.role] }}>
-                            {ROLE_LABELS[ws.role]}
+                            {roleLabels[ws.role]}
                           </span>
                           {activeWorkspace?.id === ws.id && <span style={{ color: "var(--accent)" }}>{Icons.check}</span>}
                         </div>
@@ -240,7 +240,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, userFullNam
           {!isOpen && (
             <button
               className="nav-item"
-              title="Workspace"
+              title={t("label_workspace", "Workspace")}
               onClick={() => setShowCreateModal(true)}
               style={{ justifyContent: "center" }}
             >
@@ -283,6 +283,7 @@ type NavItemProps = {
 };
 
 function NavItem({ item, activeTab, isOpen, onClick }: NavItemProps) {
+  const { t } = useTranslation();
   const isActive = activeTab === item.id;
 
   return (
@@ -296,7 +297,7 @@ function NavItem({ item, activeTab, isOpen, onClick }: NavItemProps) {
       {isOpen && (
         <>
           <span className="label">{item.label}</span>
-          {item.comingSoon && <span className="coming-soon-badge">Soon</span>}
+          {item.comingSoon && <span className="coming-soon-badge">{t("coming_soon", "Soon")}</span>}
         </>
       )}
     </button>

@@ -12,7 +12,6 @@ type Member = {
   user: { id: string; email: string; fullName?: string | null };
 };
 
-const ROLE_LABELS: Record<string, string> = { OWNER: "Owner", ADMIN: "Admin", USER: "Usuario" };
 const ROLE_COLORS: Record<string, string> = { OWNER: "#f59e0b", ADMIN: "#6366f1", USER: "#10b981" };
 
 const CloseIcon = () => (
@@ -32,6 +31,12 @@ function getToken(): string | null {
 export default function WorkspaceMembersView() {
   const { t } = useTranslation();
   const { activeWorkspace } = useWorkspace();
+
+  const roleLabels: Record<string, string> = {
+    OWNER: t("role_owner", "Owner"),
+    ADMIN: t("role_admin", "Admin"),
+    USER:  t("role_user", "User"),
+  };
 
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,10 +65,10 @@ export default function WorkspaceMembersView() {
       if (data.success) {
         setMembers(data.data.members ?? []);
       } else {
-        setError(data.message ?? "Error al cargar miembros");
+        setError(data.message ?? t("error_load_members", "Error loading members"));
       }
     } catch {
-      setError("No se pudo conectar con el servidor");
+      setError(t("server_connection_error", "Could not connect to the server"));
     } finally {
       setLoading(false);
     }
@@ -191,7 +196,7 @@ export default function WorkspaceMembersView() {
                       fontSize: "0.7rem", fontWeight: 700, padding: "0.2rem 0.55rem", borderRadius: "999px",
                       background: `${ROLE_COLORS[m.role]}22`, color: ROLE_COLORS[m.role], border: `1px solid ${ROLE_COLORS[m.role]}55`
                     }}>
-                      {ROLE_LABELS[m.role]}
+                      {roleLabels[m.role]}
                     </span>
                   </td>
                   <td style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
@@ -244,15 +249,15 @@ export default function WorkspaceMembersView() {
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="usuario@ejemplo.com"
+                  placeholder={t("placeholder_invite_email", "user@example.com")}
                   autoFocus
                 />
               </div>
               <div className="form-group">
                 <label>{t("members_role_label", "Rol")}</label>
                 <select className="form-input" value={inviteRole} onChange={(e) => setInviteRole(e.target.value as "ADMIN" | "USER")}>
-                  <option value="USER">Usuario — solo puede ver</option>
-                  <option value="ADMIN">Admin — puede editar datos</option>
+                  <option value="USER">{t("option_user_role", "User — view only")}</option>
+                  <option value="ADMIN">{t("option_admin_role", "Admin — can edit data")}</option>
                 </select>
               </div>
               {inviteError && <p style={{ color: "var(--error)", fontSize: "0.875rem" }}>{inviteError}</p>}

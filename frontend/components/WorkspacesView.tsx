@@ -5,13 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useWorkspace, Workspace } from "../lib/WorkspaceContext";
 import WorkspaceCreateModal from "./WorkspaceCreateModal";
 
-const ROLE_LABELS: Record<string, string> = { OWNER: "Owner", ADMIN: "Admin", USER: "Usuario" };
 const ROLE_COLORS: Record<string, string> = { OWNER: "#f59e0b", ADMIN: "#6366f1", USER: "#10b981" };
-const ROLE_DESC: Record<string, string> = {
-  OWNER: "Propietario — control total de la empresa y sus miembros",
-  ADMIN: "Administrador — puede editar datos de la empresa",
-  USER:  "Usuario — puede ver los datos pero no modificarlos",
-};
 
 function WorkspaceCard({
   ws,
@@ -22,6 +16,18 @@ function WorkspaceCard({
   isActive: boolean;
   onSelect: (ws: Workspace) => void;
 }) {
+  const { t } = useTranslation();
+  const roleLabels: Record<string, string> = {
+    OWNER: t("role_owner", "Owner"),
+    ADMIN: t("role_admin", "Admin"),
+    USER:  t("role_user", "User"),
+  };
+  const roleDescs: Record<string, string> = {
+    OWNER: t("role_desc_owner", "Owner — full control of the company and its members"),
+    ADMIN: t("role_desc_admin", "Admin — can edit company data"),
+    USER:  t("role_desc_user", "User — can view data but not modify it"),
+  };
+
   const initials = ws.name
     .split(" ")
     .slice(0, 2)
@@ -98,7 +104,7 @@ function WorkspaceCard({
               flexShrink: 0,
             }}
           >
-            {ROLE_LABELS[ws.role]}
+            {roleLabels[ws.role]}
           </span>
         </div>
         <p
@@ -111,7 +117,7 @@ function WorkspaceCard({
             textOverflow: "ellipsis",
           }}
         >
-          {ROLE_DESC[ws.role]}
+          {roleDescs[ws.role]}
         </p>
         {ws.description && (
           <p
@@ -146,7 +152,7 @@ function WorkspaceCard({
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
-            Activo
+            {t("workspace_active_label", "Active")}
           </span>
         </div>
       )}
@@ -159,6 +165,17 @@ export default function WorkspacesView() {
   const { workspaces, activeWorkspace, setActiveWorkspace, isLoading } = useWorkspace();
   const [showCreate, setShowCreate] = useState(false);
   const [justSwitched, setJustSwitched] = useState<string | null>(null);
+
+  const roleLabels: Record<string, string> = {
+    OWNER: t("role_owner", "Owner"),
+    ADMIN: t("role_admin", "Admin"),
+    USER:  t("role_user", "User"),
+  };
+  const roleDescs: Record<string, string> = {
+    OWNER: t("role_desc_owner", "Owner — full control of the company and its members"),
+    ADMIN: t("role_desc_admin", "Admin — can edit company data"),
+    USER:  t("role_desc_user", "User — can view data but not modify it"),
+  };
 
   function handleSelect(ws: Workspace) {
     setActiveWorkspace(ws);
@@ -234,7 +251,7 @@ export default function WorkspacesView() {
                     border: `1px solid ${ROLE_COLORS[activeWorkspace.role]}44`,
                   }}
                 >
-                  {ROLE_LABELS[activeWorkspace.role]}
+                  {roleLabels[activeWorkspace.role]}
                 </span>
               </div>
             </div>
@@ -316,9 +333,9 @@ export default function WorkspacesView() {
                     background: `${ROLE_COLORS[role]}22`, color: ROLE_COLORS[role], border: `1px solid ${ROLE_COLORS[role]}44`,
                     flexShrink: 0, minWidth: "4rem", textAlign: "center",
                   }}>
-                    {ROLE_LABELS[role]}
+                    {roleLabels[role]}
                   </span>
-                  <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{ROLE_DESC[role]}</span>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{roleDescs[role]}</span>
                 </div>
               ))}
             </div>
