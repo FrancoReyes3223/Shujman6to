@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Backend con arquitectura en capas - Express + Prisma",
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts"
   },
