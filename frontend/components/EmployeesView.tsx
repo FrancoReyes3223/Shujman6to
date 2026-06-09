@@ -1,15 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../lib/api";
 
-export type Employee = { id: number; name: string; role: string; department: string; status: string };
-
-export const INITIAL_EMPLOYEES: Employee[] = [
-  { id: 1, name: "Carlos Rodríguez", role: "Gerente de Ventas", department: "Comercial", status: "Active" },
-  { id: 2, name: "Laura Gómez", role: "Especialista en Marketing", department: "Marketing", status: "Active" },
-  { id: 3, name: "Martín Silva", role: "Desarrollador Frontend", department: "IT", status: "On Vacation" },
-  { id: 4, name: "Ana Martínez", role: "Analista de RRHH", department: "Recursos Humanos", status: "Active" },
-  { id: 5, name: "Pedro Sánchez", role: "Soporte Técnico", department: "IT", status: "Inactive" },
-];
+export type Employee = { id: string; name: string; role: string; department: string; status: string };
 
 const EditIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -118,7 +111,19 @@ function EmpModal({
   );
 }
 
-export default function EmployeesView({ employees, setEmployees, readOnly = false }: { employees: Employee[], setEmployees: (emps: Employee[]) => void, readOnly?: boolean }) {
+export default function EmployeesView({
+  employees,
+  setEmployees,
+  readOnly = false,
+  workspaceId,
+  token,
+}: {
+  employees: Employee[];
+  setEmployees: (emps: Employee[]) => void;
+  readOnly?: boolean;
+  workspaceId: string;
+  token: string;
+}) {
   const { t } = useTranslation();
 
   const [addForm, setAddForm] = useState<EmpForm>(EMPTY_EMP);
@@ -134,9 +139,15 @@ export default function EmployeesView({ employees, setEmployees, readOnly = fals
     setShowAddModal(true);
   };
 
-  const handleAddSubmit = () => {
+  const handleAddSubmit = async () => {
     if (!addForm.name.trim()) return;
-    setEmployees([{ id: Date.now(), ...addForm }, ...employees]);
+    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/employees`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(addForm),
+    });
+    const data = await res.json();
+    if (data.success) setEmployees([data.data, ...employees]);
     setShowAddModal(false);
   };
 
@@ -145,15 +156,26 @@ export default function EmployeesView({ employees, setEmployees, readOnly = fals
     setEditForm({ name: emp.name, role: emp.role, department: emp.department, status: emp.status });
   };
 
-  const handleEditSubmit = () => {
+  const handleEditSubmit = async () => {
     if (!editTarget || !editForm.name.trim()) return;
-    setEmployees(employees.map(e => e.id === editTarget.id ? { ...editTarget, ...editForm } : e));
+    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/employees/${editTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(editForm),
+    });
+    const data = await res.json();
+    if (data.success) setEmployees(employees.map(e => e.id === editTarget.id ? data.data : e));
     setEditTarget(null);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
-    setEmployees(employees.filter(e => e.id !== deleteTarget.id));
+    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/employees/${deleteTarget.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (data.success) setEmployees(employees.filter(e => e.id !== deleteTarget.id));
     setDeleteTarget(null);
   };
 

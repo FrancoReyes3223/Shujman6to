@@ -8,8 +8,10 @@ import { API_BASE } from "../../lib/api";
 import { WorkspaceProvider, useWorkspace } from "../../lib/WorkspaceContext";
 import Sidebar from "../../components/Sidebar";
 import OverviewView from "../../components/OverviewView";
-import EmployeesView, { INITIAL_EMPLOYEES } from "../../components/EmployeesView";
-import ProductsView, { INITIAL_PRODUCTS } from "../../components/ProductsView";
+import EmployeesView from "../../components/EmployeesView";
+import ProductsView from "../../components/ProductsView";
+import type { Employee } from "../../components/EmployeesView";
+import type { Product } from "../../components/ProductsView";
 import AccountView from "../../components/AccountView";
 import CompanyView from "../../components/CompanyView";
 import WorkspaceMembersView from "../../components/WorkspaceMembersView";
@@ -24,41 +26,30 @@ function DashboardInner() {
   const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [token, setToken] = useState<string>("");
 
   // ─── Data keyed by workspaceId ───────────────────────────────────────────────
-  const wsKey = activeWorkspace?.id ?? "__no_workspace__";
+  const wsKey = activeWorkspace?.id ?? "";
 
-  const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  // Load data from localStorage when workspace changes
+  // Fetch employees and products when workspace or token changes
   useEffect(() => {
-    const savedEmps = localStorage.getItem(`shujman_employees_${wsKey}`);
-    if (savedEmps) {
-      try { setEmployees(JSON.parse(savedEmps)); } catch { setEmployees(INITIAL_EMPLOYEES); }
-    } else {
-      setEmployees(INITIAL_EMPLOYEES);
-    }
-
-    const savedProds = localStorage.getItem(`shujman_products_${wsKey}`);
-    if (savedProds) {
-      try { setProducts(JSON.parse(savedProds)); } catch { setProducts(INITIAL_PRODUCTS); }
-    } else {
-      setProducts(INITIAL_PRODUCTS);
-    }
-
-    setIsLoaded(true);
-  }, [wsKey]);
-
-  // Persist when data changes
-  useEffect(() => {
-    if (isLoaded) localStorage.setItem(`shujman_employees_${wsKey}`, JSON.stringify(employees));
-  }, [employees, isLoaded, wsKey]);
-
-  useEffect(() => {
-    if (isLoaded) localStorage.setItem(`shujman_products_${wsKey}`, JSON.stringify(products));
-  }, [products, isLoaded, wsKey]);
+    if (!wsKey || !token) return;
+    fetch(`${API_BASE}/workspaces/${wsKey}/employees`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(d => { if (d.success) setEmployees(d.data); })
+      .catch(() => {});
+    fetch(`${API_BASE}/workspaces/${wsKey}/products`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(d => { if (d.success) setProducts(d.data); })
+      .catch(() => {});
+  }, [wsKey, token]);
 
   // ─── Auth ─────────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -69,13 +60,14 @@ function DashboardInner() {
       return null;
     }
 
-    const token = getCookie("token");
-    if (!token) { router.replace("/"); return; }
+    const tok = getCookie("token");
+    if (!tok) { router.replace("/"); return; }
+    setToken(tok);
 
     async function fetchProfile() {
       try {
         const res = await fetch(`${API_BASE}/usuarios/perfil`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${tok}` },
         });
         const data = await res.json();
         if (data.success) {
@@ -117,16 +109,16 @@ function DashboardInner() {
           <OverviewView employees={employees} products={products} />
         </div>
         <div style={{ display: activeTab === "employees" ? "block" : "none" }}>
-          <EmployeesView employees={employees} setEmployees={setEmployees} readOnly={readOnly} />
+          <EmployeesView employees={employees} setEmployees={setEmployees} readOnly={readOnly} workspaceId={wsKey} token={token} />
         </div>
         <div style={{ display: activeTab === "products" ? "block" : "none" }}>
-          <ProductsView products={products} setProducts={setProducts} readOnly={readOnly} />
+          <ProductsView products={products} setProducts={setProducts} readOnly={readOnly} workspaceId={wsKey} token={token} />
         </div>
         <div style={{ display: activeTab === "cuenta" ? "block" : "none" }}>
           <AccountView user={user} />
         </div>
         <div style={{ display: activeTab === "ws-company" ? "block" : "none" }}>
-          <CompanyView />
+          <CompanyView workspaceId={wsKey} token={token} readOnly={activeWorkspace?.role !== "OWNER"} />
         </div>
         <div style={{ display: activeTab === "ws-members" ? "block" : "none" }}>
           <WorkspaceMembersView />

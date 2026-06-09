@@ -118,4 +118,21 @@ export const workspacesService = {
     if (!membership) throw new Error('No eres miembro de este workspace')
     if (membership.role !== requiredRole) throw new Error('No tienes permisos para realizar esta acción')
   },
+
+  /** Helper: verifica que el userId sea OWNER o ADMIN (no USER) */
+  async requireAtLeastAdmin(userId: string, workspaceId: string) {
+    const membership = await prisma.workspaceMember.findUnique({
+      where: { userId_workspaceId: { userId, workspaceId } },
+    })
+    if (!membership) throw new Error('No eres miembro de este workspace')
+    if (membership.role === WorkspaceRole.USER) throw new Error('No tienes permisos para realizar esta acción')
+  },
+
+  /** Helper: verifica que el userId sea miembro (cualquier rol) */
+  async requireMember(userId: string, workspaceId: string) {
+    const membership = await prisma.workspaceMember.findUnique({
+      where: { userId_workspaceId: { userId, workspaceId } },
+    })
+    if (!membership) throw new Error('No eres miembro de este workspace')
+  },
 }

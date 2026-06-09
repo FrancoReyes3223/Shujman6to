@@ -1,15 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../lib/api";
 
-export type Product = { id: number; name: string; category: string; price: string; stock: string; status: string };
-
-export const INITIAL_PRODUCTS: Product[] = [
-  { id: 1, name: "Licencia Software Básico", category: "Servicios", price: "$150.00", stock: "Ilimitado", status: "Normal" },
-  { id: 2, name: "Licencia Software Pro", category: "Servicios", price: "$300.00", stock: "Ilimitado", status: "Normal" },
-  { id: 3, name: "Servidor Dedicado Tipo A", category: "Hardware", price: "$1,200.00", stock: "5", status: "Low" },
-  { id: 4, name: "Soporte Técnico Premium 1 Año", category: "Servicios", price: "$500.00", stock: "Ilimitado", status: "Normal" },
-  { id: 5, name: "Router Empresarial", category: "Hardware", price: "$250.00", stock: "0", status: "Out of Stock" },
-];
+export type Product = { id: string; name: string; category: string; price: string; stock: string; status: string };
 
 const EditIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +124,19 @@ function ProdModal({
   );
 }
 
-export default function ProductsView({ products, setProducts, readOnly = false }: { products: Product[], setProducts: (prods: Product[]) => void, readOnly?: boolean }) {
+export default function ProductsView({
+  products,
+  setProducts,
+  readOnly = false,
+  workspaceId,
+  token,
+}: {
+  products: Product[];
+  setProducts: (prods: Product[]) => void;
+  readOnly?: boolean;
+  workspaceId: string;
+  token: string;
+}) {
   const { t } = useTranslation();
 
   const [addForm, setAddForm] = useState<ProdForm>(EMPTY_PROD);
@@ -147,9 +152,15 @@ export default function ProductsView({ products, setProducts, readOnly = false }
     setShowAddModal(true);
   };
 
-  const handleAddSubmit = () => {
+  const handleAddSubmit = async () => {
     if (!addForm.name.trim()) return;
-    setProducts([{ id: Date.now(), ...addForm, price: normalizePrice(addForm.price) }, ...products]);
+    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/products`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ ...addForm, price: normalizePrice(addForm.price) }),
+    });
+    const data = await res.json();
+    if (data.success) setProducts([data.data, ...products]);
     setShowAddModal(false);
   };
 
@@ -158,15 +169,26 @@ export default function ProductsView({ products, setProducts, readOnly = false }
     setEditForm({ name: prod.name, category: prod.category, price: prod.price, stock: prod.stock, status: prod.status });
   };
 
-  const handleEditSubmit = () => {
+  const handleEditSubmit = async () => {
     if (!editTarget || !editForm.name.trim()) return;
-    setProducts(products.map(p => p.id === editTarget.id ? { ...editTarget, ...editForm, price: normalizePrice(editForm.price) } : p));
+    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/products/${editTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ ...editForm, price: normalizePrice(editForm.price) }),
+    });
+    const data = await res.json();
+    if (data.success) setProducts(products.map(p => p.id === editTarget.id ? data.data : p));
     setEditTarget(null);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
-    setProducts(products.filter(p => p.id !== deleteTarget.id));
+    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/products/${deleteTarget.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (data.success) setProducts(products.filter(p => p.id !== deleteTarget.id));
     setDeleteTarget(null);
   };
 
