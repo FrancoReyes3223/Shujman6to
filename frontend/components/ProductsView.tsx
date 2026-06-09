@@ -131,7 +131,7 @@ function ProdModal({
   );
 }
 
-export default function ProductsView({ products, setProducts }: { products: Product[], setProducts: (prods: Product[]) => void }) {
+export default function ProductsView({ products, setProducts, readOnly = false }: { products: Product[], setProducts: (prods: Product[]) => void, readOnly?: boolean }) {
   const { t } = useTranslation();
 
   const [addForm, setAddForm] = useState<ProdForm>(EMPTY_PROD);
@@ -183,9 +183,11 @@ export default function ProductsView({ products, setProducts }: { products: Prod
       <div className="table-container">
         <div className="table-header">
           <h2>{t("prod_list_title", "Current Inventory")}</h2>
-          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
-            {t("prod_btn_new", "+ New Product")}
-          </button>
+          {!readOnly && (
+            <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
+              {t("prod_btn_new", "+ New Product")}
+            </button>
+          )}
         </div>
         <table className="data-table">
           <thead>
@@ -195,7 +197,7 @@ export default function ProductsView({ products, setProducts }: { products: Prod
               <th>{t("prod_col_price", "Price")}</th>
               <th>{t("prod_col_stock", "Stock")}</th>
               <th>{t("prod_col_status", "Status")}</th>
-              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>
+              {!readOnly && <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>}
             </tr>
           </thead>
           <tbody>
@@ -213,24 +215,26 @@ export default function ProductsView({ products, setProducts }: { products: Prod
                     {prod.status === 'Normal' ? t('status_normal', 'Normal') : prod.status === 'Low' ? t('status_low', 'Low') : t('status_out', 'Out of Stock')}
                   </span>
                 </td>
-                <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                  <button
-                    className="btn-action"
-                    onClick={() => handleEditClick(prod)}
-                    title={t("prod_btn_edit", "Edit product")}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <EditIcon />
-                  </button>
-                  <button
-                    className="btn-action"
-                    onClick={() => setDeleteTarget(prod)}
-                    title={t("btn_delete", "Delete")}
-                    style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
-                  >
-                    <TrashIcon />
-                  </button>
-                </td>
+                {!readOnly && (
+                  <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                    <button
+                      className="btn-action"
+                      onClick={() => handleEditClick(prod)}
+                      title={t("prod_btn_edit", "Edit product")}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <EditIcon />
+                    </button>
+                    <button
+                      className="btn-action"
+                      onClick={() => setDeleteTarget(prod)}
+                      title={t("btn_delete", "Delete")}
+                      style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

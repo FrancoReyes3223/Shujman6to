@@ -118,7 +118,7 @@ function EmpModal({
   );
 }
 
-export default function EmployeesView({ employees, setEmployees }: { employees: Employee[], setEmployees: (emps: Employee[]) => void }) {
+export default function EmployeesView({ employees, setEmployees, readOnly = false }: { employees: Employee[], setEmployees: (emps: Employee[]) => void, readOnly?: boolean }) {
   const { t } = useTranslation();
 
   const [addForm, setAddForm] = useState<EmpForm>(EMPTY_EMP);
@@ -170,9 +170,11 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
       <div className="table-container">
         <div className="table-header">
           <h2>{t("emp_list_title", "Staff List")}</h2>
-          <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
-            {t("emp_btn_new", "+ New Employee")}
-          </button>
+          {!readOnly && (
+            <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
+              {t("emp_btn_new", "+ New Employee")}
+            </button>
+          )}
         </div>
         <table className="data-table">
           <thead>
@@ -181,7 +183,7 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
               <th>{t("emp_col_role", "Role")}</th>
               <th>{t("emp_col_dept", "Department")}</th>
               <th>{t("emp_col_status", "Status")}</th>
-              <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>
+              {!readOnly && <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>}
             </tr>
           </thead>
           <tbody>
@@ -198,24 +200,26 @@ export default function EmployeesView({ employees, setEmployees }: { employees: 
                     {emp.status === 'Active' ? t('status_active', 'Active') : emp.status === 'On Vacation' ? t('status_vacation', 'On Vacation') : t('status_inactive', 'Inactive')}
                   </span>
                 </td>
-                <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                  <button
-                    className="btn-action"
-                    onClick={() => handleEditClick(emp)}
-                    title={t("emp_btn_edit", "Edit employee")}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <EditIcon />
-                  </button>
-                  <button
-                    className="btn-action"
-                    onClick={() => setDeleteTarget(emp)}
-                    title={t("btn_delete", "Delete")}
-                    style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
-                  >
-                    <TrashIcon />
-                  </button>
-                </td>
+                {!readOnly && (
+                  <td style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                    <button
+                      className="btn-action"
+                      onClick={() => handleEditClick(emp)}
+                      title={t("emp_btn_edit", "Edit employee")}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <EditIcon />
+                    </button>
+                    <button
+                      className="btn-action"
+                      onClick={() => setDeleteTarget(emp)}
+                      title={t("btn_delete", "Delete")}
+                      style={{ cursor: 'pointer', color: 'var(--error)', borderColor: 'var(--error)' }}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
