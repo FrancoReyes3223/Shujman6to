@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "../../lib/api";
-import { WorkspaceProvider, useWorkspace } from "../../lib/WorkspaceContext";
+import { useWorkspace } from "../../lib/WorkspaceContext";
+import { useUser } from "../../lib/UserContext";
 import Sidebar from "../../components/Sidebar";
 import OverviewView from "../../components/OverviewView";
 import EmployeesView from "../../components/EmployeesView";
@@ -17,13 +17,16 @@ import CompanyView from "../../components/CompanyView";
 import WorkspaceMembersView from "../../components/WorkspaceMembersView";
 import WorkspacesView from "../../components/WorkspacesView";
 
-// Inner component that uses the workspace context
+const VALID_TABS = ["overview", "employees", "products", "cuenta", "ws-company", "ws-members", "workspaces"];
+
+// Inner component that uses the workspace and user contexts
 function DashboardInner() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { activeWorkspace } = useWorkspace();
+  const searchParams = useSearchParams();
+  const { activeWorkspace, refreshWorkspaces } = useWorkspace();
+  const { user, isError, refreshUser, logout } = useUser();
 
-  const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [token, setToken] = useState<string>("");
@@ -64,30 +67,26 @@ function DashboardInner() {
     if (!tok) { router.replace("/"); return; }
     setToken(tok);
 
-    async function fetchProfile() {
-      try {
-        const res = await fetch(`${API_BASE}/usuarios/perfil`, {
-          headers: { Authorization: `Bearer ${tok}` },
-        });
-        const data = await res.json();
-        if (data.success) {
-          setUser(data.data);
-        } else {
-          document.cookie = "token=; path=/; max-age=0";
-          router.replace("/");
-        }
-      } catch {
-        document.cookie = "token=; path=/; max-age=0";
-        router.replace("/");
-      }
-    }
-    fetchProfile();
-  }, [router]);
+    // Providers live in the root layout, so after a client-side navigation
+    // from login they keep their pre-login state and need a refresh
+    refreshUser();
+    refreshWorkspaces();
+  }, [router, refreshUser, refreshWorkspaces]);
 
-  function handleLogout() {
-    document.cookie = "token=; path=/; max-age=0";
-    router.push("/");
-  }
+  // Redirect to login if the profile fetch failed (invalid/expired token)
+  useEffect(() => {
+    if (isError) {
+      logout();
+      router.replace("/");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError, router]);
+
+  // Allow deep-linking to a tab via ?tab= (used by the navbar user menu)
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && VALID_TABS.includes(tab)) setActiveTab(tab);
+  }, [searchParams]);
 
   // readOnly when role is USER (can view but not edit)
   const readOnly = activeWorkspace?.role === "USER";
@@ -97,8 +96,6 @@ function DashboardInner() {
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onLogout={handleLogout}
-        userFullName={user?.fullName}
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
       />
@@ -127,7 +124,7 @@ function DashboardInner() {
           <WorkspacesView />
         </div>
 
-        {!["overview", "employees", "products", "cuenta", "ws-company", "ws-members", "workspaces"].includes(activeTab) && (
+        {!VALID_TABS.includes(activeTab) && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, color: "var(--text-secondary)", marginTop: "4rem" }}>
             <div style={{ fontSize: "5rem", animation: "bounce 2s infinite ease-in-out", display: "inline-block" }}>
               🚧
@@ -141,41 +138,16 @@ function DashboardInner() {
           </div>
         )}
 
-        <footer style={{ padding: "1.5rem 2rem", borderTop: "1px solid var(--border-color)", marginTop: "auto", display: "flex", justifyContent: "center" }}>
-          <Link
-            href="/docs"
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "0.5rem",
-              padding: "0.5rem 1.25rem", borderRadius: "0.5rem",
-              border: "1px solid var(--border-color)", color: "var(--text-secondary)",
-              fontSize: "0.875rem", textDecoration: "none",
-              transition: "background 0.15s, border-color 0.15s",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-secondary)";
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "";
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border-color)";
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
-            {t("docs_button", "View Documentation")}
-          </Link>
-        </footer>
       </main>
     </div>
   );
 }
 
-// Outer component wraps with WorkspaceProvider
+// Suspense boundary required by useSearchParams in static export builds
 export default function DashboardPage() {
   return (
-    <WorkspaceProvider>
+    <Suspense>
       <DashboardInner />
-    </WorkspaceProvider>
+    </Suspense>
   );
 }

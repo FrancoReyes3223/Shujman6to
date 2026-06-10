@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import I18nProvider from "../components/I18nProvider";
-import LanguageSwitcher from "../components/LanguageSwitcher";
+import Navbar from "../components/Navbar";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { UserProvider } from "../lib/UserContext";
+import { WorkspaceProvider } from "../lib/WorkspaceContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SchujmanB2B - Login",
-  description: "Sistema de autenticación",
+  title: "ShujmanB2B",
+  description: "Sistema de gestión B2B",
 };
 
 export default function RootLayout({
@@ -48,8 +50,12 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <I18nProvider>
-            <LanguageSwitcher />
-            {children}
+            <UserProvider>
+              <WorkspaceProvider>
+                <Navbar />
+                {children}
+              </WorkspaceProvider>
+            </UserProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

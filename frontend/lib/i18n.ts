@@ -15,7 +15,6 @@ const en = {
   have_account: "Already have an account?",
   invalid_credentials: "Invalid credentials",
   invalid_email: "Please enter a valid email",
-  loading_profile: "Loading profile...",
   logout: "Log out",
   name_required: "Name is required",
   no_account: "Don't have an account?",
@@ -50,7 +49,10 @@ const en = {
   sidebar_overview: "Overview",
   sidebar_employees: "Employees",
   sidebar_products: "Products",
-  greeting_user: "Hello, {{name}}",
+  // Navbar
+  navbar_docs: "Docs",
+  navbar_my_account: "My account",
+  navbar_user_menu_aria: "User menu",
   // Overview
   overview_title: "General Overview",
   overview_desc: "A quick look at the company's main metrics.",
@@ -88,8 +90,6 @@ const en = {
   status_out: "Out of Stock",
   // ThemeToggle
   aria_toggle_dark_mode: "Toggle dark mode",
-  // Footer
-  docs_button: "View Documentation",
   btn_cancel: "Cancel",
   btn_delete: "Delete",
   btn_saving: "Saving...",
@@ -197,7 +197,6 @@ const es = {
   have_account: "¿Ya tenés cuenta?",
   invalid_credentials: "Credenciales incorrectas",
   invalid_email: "Ingresá un email válido",
-  loading_profile: "Cargando perfil...",
   logout: "Cerrar sesión",
   name_required: "El nombre es obligatorio",
   no_account: "¿No tenés cuenta?",
@@ -232,7 +231,10 @@ const es = {
   sidebar_overview: "Resumen",
   sidebar_employees: "Empleados",
   sidebar_products: "Productos",
-  greeting_user: "Hola, {{name}}",
+  // Navbar
+  navbar_docs: "Documentación",
+  navbar_my_account: "Mi cuenta",
+  navbar_user_menu_aria: "Menú de usuario",
   // Overview
   overview_title: "Resumen General",
   overview_desc: "Un vistazo rápido a las métricas principales de la empresa.",
@@ -270,8 +272,6 @@ const es = {
   status_out: "Agotado",
   // ThemeToggle
   aria_toggle_dark_mode: "Alternar modo oscuro",
-  // Footer
-  docs_button: "Ver documentación",
   btn_cancel: "Cancelar",
   btn_delete: "Eliminar",
   btn_saving: "Guardando...",
