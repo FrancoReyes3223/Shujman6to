@@ -42,6 +42,8 @@ jobs:
 
       - name: Compilar docs
         run: npm run build --prefix docs
+        env:
+          USUARIO: ${{ secrets.SERVER_USER }}
 
       # 4. Copiar docs compilados a frontend/public/docs/
       - name: Copiar docs al frontend
