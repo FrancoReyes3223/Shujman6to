@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Levanta el entorno de desarrollo completo: docs, backend y frontend.
 #
+# Requiere haber corrido antes `npm install` en la raíz (instala
+# dependencias y aplica migraciones via scripts/install.sh).
+#
 # Uso:
 #   ./scripts/dev.sh
 #
@@ -22,24 +25,18 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-echo "==> [1/4] Instalando dependencias..."
-cd "$ROOT/backend" && npm install
-cd "$ROOT/frontend" && npm install
-cd "$ROOT/docs" && npm install
-
-echo ""
-echo "==> [2/4] Buildeando docs..."
+echo "==> [1/3] Buildeando docs..."
 cd "$ROOT"
 npm run dev:docs
 
 echo ""
-echo "==> [3/4] Iniciando backend (puerto 3001)..."
+echo "==> [2/3] Iniciando backend (puerto 3001)..."
 cd "$ROOT/backend"
 npm run dev &
 BACKEND_PID=$!
 
 echo ""
-echo "==> [4/4] Iniciando frontend (puerto 3000)..."
+echo "==> [3/3] Iniciando frontend (puerto 3000)..."
 cd "$ROOT/frontend"
 npm run dev &
 FRONTEND_PID=$!

@@ -2,6 +2,7 @@
   "name": "shujman",
   "private": true,
   "scripts": {
+    "postinstall": "./scripts/install.sh",
     "build": "npm run build:docs && npm run build:frontend",
     "build:docs": "npm run build --prefix docs",
     "build:frontend": "node scripts/copy-docs.mjs && npm run build --prefix frontend",
