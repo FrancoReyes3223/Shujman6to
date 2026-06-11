@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "../lib/api";
+import { useTableControls } from "../lib/useTableControls";
+import { TableToolbar, TablePagination, SortHeader } from "./TableControls";
 
 export type Employee = { id: string; name: string; role: string; department: string; status: string };
 
@@ -26,20 +28,49 @@ const EMPTY_EMP = { name: "", role: "", department: "", status: "Active" };
 
 type EmpForm = Omit<Employee, "id">;
 
+type EmpErrors = Partial<Record<"name" | "role" | "department", string>>;
+
+const fieldErrorStyle = { color: 'var(--error)', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' };
+
 function EmpModal({
   title,
   form,
   onChange,
   onClose,
   onSubmit,
+  serverError,
 }: {
   title: string;
   form: EmpForm;
   onChange: (f: EmpForm) => void;
   onClose: () => void;
   onSubmit: () => void;
+  serverError?: string;
 }) {
   const { t } = useTranslation();
+  const [errors, setErrors] = useState<EmpErrors>({});
+
+  const update = (patch: Partial<EmpForm>) => {
+    onChange({ ...form, ...patch });
+    setErrors(prev => {
+      const next = { ...prev };
+      for (const key of Object.keys(patch)) delete next[key as keyof EmpErrors];
+      return next;
+    });
+  };
+
+  const handleSave = () => {
+    const next: EmpErrors = {};
+    if (!form.name.trim()) next.name = t("emp_err_name_required", "Name is required");
+    if (!form.role.trim()) next.role = t("emp_err_role_required", "Position is required");
+    if (!form.department.trim()) next.department = t("emp_err_dept_required", "Department is required");
+    if (Object.keys(next).length > 0) {
+      setErrors(next);
+      return;
+    }
+    onSubmit();
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -48,40 +79,51 @@ function EmpModal({
           <button className="btn-close" onClick={onClose}><CloseIcon /></button>
         </div>
         <div className="modal-body">
+          {serverError && (
+            <div style={{ background: 'var(--error-bg, rgba(220,38,38,0.1))', color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '0.5rem', padding: '0.6rem 0.85rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+              {serverError}
+            </div>
+          )}
           <div className="form-group">
             <label>{t("emp_col_name", "Name")}</label>
             <input
               className="form-input"
               value={form.name}
-              onChange={e => onChange({ ...form, name: e.target.value })}
+              onChange={e => update({ name: e.target.value })}
               placeholder={t("emp_col_name", "Name")}
+              style={errors.name ? { borderColor: 'var(--error)' } : undefined}
               autoFocus
             />
+            {errors.name && <span style={fieldErrorStyle}>{errors.name}</span>}
           </div>
           <div className="form-group">
             <label>{t("emp_col_role", "Role")}</label>
             <input
               className="form-input"
               value={form.role}
-              onChange={e => onChange({ ...form, role: e.target.value })}
+              onChange={e => update({ role: e.target.value })}
               placeholder={t("emp_col_role", "Role")}
+              style={errors.role ? { borderColor: 'var(--error)' } : undefined}
             />
+            {errors.role && <span style={fieldErrorStyle}>{errors.role}</span>}
           </div>
           <div className="form-group">
             <label>{t("emp_col_dept", "Department")}</label>
             <input
               className="form-input"
               value={form.department}
-              onChange={e => onChange({ ...form, department: e.target.value })}
+              onChange={e => update({ department: e.target.value })}
               placeholder={t("emp_col_dept", "Department")}
+              style={errors.department ? { borderColor: 'var(--error)' } : undefined}
             />
+            {errors.department && <span style={fieldErrorStyle}>{errors.department}</span>}
           </div>
           <div className="form-group">
             <label>{t("emp_col_status", "Status")}</label>
             <select
               className="form-input"
               value={form.status}
-              onChange={e => onChange({ ...form, status: e.target.value })}
+              onChange={e => update({ status: e.target.value })}
             >
               <option value="Active">{t("status_active", "Active")}</option>
               <option value="On Vacation">{t("status_vacation", "On Vacation")}</option>
@@ -100,8 +142,7 @@ function EmpModal({
           <button
             className="btn-primary"
             style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
-            onClick={onSubmit}
-            disabled={!form.name.trim()}
+            onClick={handleSave}
           >
             {t("btn_save", "Save")}
           </button>
@@ -126,46 +167,78 @@ export default function EmployeesView({
 }) {
   const { t } = useTranslation();
 
+  const table = useTableControls(employees, {
+    searchFields: ["name", "role", "department", "status"],
+    statusField: "status",
+  });
+
+  const statusOptions = [
+    { value: "Active", label: t("status_active", "Active") },
+    { value: "On Vacation", label: t("status_vacation", "On Vacation") },
+    { value: "Inactive", label: t("status_inactive", "Inactive") },
+  ];
+
   const [addForm, setAddForm] = useState<EmpForm>(EMPTY_EMP);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addError, setAddError] = useState("");
 
   const [editTarget, setEditTarget] = useState<Employee | null>(null);
   const [editForm, setEditForm] = useState<EmpForm>(EMPTY_EMP);
+  const [editError, setEditError] = useState("");
 
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
 
   const handleAddNew = () => {
     setAddForm(EMPTY_EMP);
+    setAddError("");
     setShowAddModal(true);
   };
 
   const handleAddSubmit = async () => {
-    if (!addForm.name.trim()) return;
-    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/employees`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(addForm),
-    });
-    const data = await res.json();
-    if (data.success) setEmployees([data.data, ...employees]);
-    setShowAddModal(false);
+    setAddError("");
+    try {
+      const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/employees`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(addForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEmployees([data.data, ...employees]);
+        setShowAddModal(false);
+      } else {
+        setAddError(data.message || t("save_error", "Could not save changes. Please try again."));
+      }
+    } catch {
+      setAddError(t("server_connection_error", "Could not connect to the server"));
+    }
   };
 
   const handleEditClick = (emp: Employee) => {
     setEditTarget(emp);
+    setEditError("");
     setEditForm({ name: emp.name, role: emp.role, department: emp.department, status: emp.status });
   };
 
   const handleEditSubmit = async () => {
-    if (!editTarget || !editForm.name.trim()) return;
-    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/employees/${editTarget.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(editForm),
-    });
-    const data = await res.json();
-    if (data.success) setEmployees(employees.map(e => e.id === editTarget.id ? data.data : e));
-    setEditTarget(null);
+    if (!editTarget) return;
+    setEditError("");
+    try {
+      const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/employees/${editTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(editForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEmployees(employees.map(e => e.id === editTarget.id ? data.data : e));
+        setEditTarget(null);
+      } else {
+        setEditError(data.message || t("save_error", "Could not save changes. Please try again."));
+      }
+    } catch {
+      setEditError(t("server_connection_error", "Could not connect to the server"));
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -198,18 +271,32 @@ export default function EmployeesView({
             </button>
           )}
         </div>
+        <TableToolbar
+          query={table.query}
+          onQueryChange={table.setQuery}
+          statusFilter={table.statusFilter}
+          onStatusChange={table.setStatusFilter}
+          statusOptions={statusOptions}
+        />
         <table className="data-table">
           <thead>
             <tr>
-              <th>{t("emp_col_name", "Name")}</th>
-              <th>{t("emp_col_role", "Role")}</th>
-              <th>{t("emp_col_dept", "Department")}</th>
-              <th>{t("emp_col_status", "Status")}</th>
+              <SortHeader label={t("emp_col_name", "Name")} columnKey="name" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
+              <SortHeader label={t("emp_col_role", "Role")} columnKey="role" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
+              <SortHeader label={t("emp_col_dept", "Department")} columnKey="department" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
+              <SortHeader label={t("emp_col_status", "Status")} columnKey="status" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
               {!readOnly && <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>}
             </tr>
           </thead>
           <tbody>
-            {employees.map((emp) => (
+            {table.total === 0 && (
+              <tr>
+                <td colSpan={readOnly ? 4 : 5} style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '1.5rem' }}>
+                  {t("tbl_no_results", "No results")}
+                </td>
+              </tr>
+            )}
+            {table.paged.map((emp) => (
               <tr key={emp.id}>
                 <td style={{ fontWeight: 500 }}>{emp.name}</td>
                 <td>{emp.role}</td>
@@ -246,6 +333,14 @@ export default function EmployeesView({
             ))}
           </tbody>
         </table>
+        <TablePagination
+          page={table.page}
+          pageCount={table.pageCount}
+          pageSize={table.pageSize}
+          onPageSizeChange={table.setPageSize}
+          onPrev={() => table.setPage(table.page - 1)}
+          onNext={() => table.setPage(table.page + 1)}
+        />
       </div>
 
       {showAddModal && (
@@ -255,6 +350,7 @@ export default function EmployeesView({
           onChange={setAddForm}
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAddSubmit}
+          serverError={addError}
         />
       )}
 
@@ -265,6 +361,7 @@ export default function EmployeesView({
           onChange={setEditForm}
           onClose={() => setEditTarget(null)}
           onSubmit={handleEditSubmit}
+          serverError={editError}
         />
       )}
 

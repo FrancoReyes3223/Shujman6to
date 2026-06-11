@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "../lib/api";
+import { useTableControls } from "../lib/useTableControls";
+import { TableToolbar, TablePagination, SortHeader } from "./TableControls";
 
 export type Product = { id: string; name: string; category: string; price: string; stock: string; status: string };
 
@@ -139,6 +141,18 @@ export default function ProductsView({
 }) {
   const { t } = useTranslation();
 
+  const table = useTableControls(products, {
+    searchFields: ["name", "category", "status"],
+    statusField: "status",
+    numericFields: ["price", "stock"],
+  });
+
+  const statusOptions = [
+    { value: "Normal", label: t("status_normal", "Normal") },
+    { value: "Low", label: t("status_low", "Low") },
+    { value: "Out of Stock", label: t("status_out", "Out of Stock") },
+  ];
+
   const [addForm, setAddForm] = useState<ProdForm>(EMPTY_PROD);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -211,19 +225,33 @@ export default function ProductsView({
             </button>
           )}
         </div>
+        <TableToolbar
+          query={table.query}
+          onQueryChange={table.setQuery}
+          statusFilter={table.statusFilter}
+          onStatusChange={table.setStatusFilter}
+          statusOptions={statusOptions}
+        />
         <table className="data-table">
           <thead>
             <tr>
-              <th>{t("prod_col_name", "Product/Service Name")}</th>
-              <th>{t("prod_col_category", "Category")}</th>
-              <th>{t("prod_col_price", "Price")}</th>
-              <th>{t("prod_col_stock", "Stock")}</th>
-              <th>{t("prod_col_status", "Status")}</th>
+              <SortHeader label={t("prod_col_name", "Product/Service Name")} columnKey="name" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
+              <SortHeader label={t("prod_col_category", "Category")} columnKey="category" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
+              <SortHeader label={t("prod_col_price", "Price")} columnKey="price" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
+              <SortHeader label={t("prod_col_stock", "Stock")} columnKey="stock" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
+              <SortHeader label={t("prod_col_status", "Status")} columnKey="status" sortKey={table.sortKey as string | null} sortDir={table.sortDir} onSort={table.toggleSort} />
               {!readOnly && <th style={{ width: '80px', textAlign: 'center' }}>{t("col_actions", "Actions")}</th>}
             </tr>
           </thead>
           <tbody>
-            {products.map((prod) => (
+            {table.total === 0 && (
+              <tr>
+                <td colSpan={readOnly ? 5 : 6} style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '1.5rem' }}>
+                  {t("tbl_no_results", "No results")}
+                </td>
+              </tr>
+            )}
+            {table.paged.map((prod) => (
               <tr key={prod.id}>
                 <td style={{ fontWeight: 500 }}>{prod.name}</td>
                 <td>{prod.category}</td>
@@ -261,6 +289,14 @@ export default function ProductsView({
             ))}
           </tbody>
         </table>
+        <TablePagination
+          page={table.page}
+          pageCount={table.pageCount}
+          pageSize={table.pageSize}
+          onPageSizeChange={table.setPageSize}
+          onPrev={() => table.setPage(table.page - 1)}
+          onNext={() => table.setPage(table.page + 1)}
+        />
       </div>
 
       {showAddModal && (
