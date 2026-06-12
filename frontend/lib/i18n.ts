@@ -15,7 +15,6 @@ const en = {
   have_account: "Already have an account?",
   invalid_credentials: "Invalid credentials",
   invalid_email: "Please enter a valid email",
-  loading_profile: "Loading profile...",
   logout: "Log out",
   name_required: "Name is required",
   no_account: "Don't have an account?",
@@ -50,7 +49,10 @@ const en = {
   sidebar_overview: "Overview",
   sidebar_employees: "Employees",
   sidebar_products: "Products",
-  greeting_user: "Hello, {{name}}",
+  // Navbar
+  navbar_docs: "Docs",
+  navbar_my_account: "My account",
+  navbar_user_menu_aria: "User menu",
   // Overview
   overview_title: "General Overview",
   overview_desc: "A quick look at the company's main metrics.",
@@ -72,6 +74,10 @@ const en = {
   status_inactive: "Inactive",
   btn_save: "Save",
   emp_btn_edit: "Edit employee",
+  emp_err_name_required: "Name is required",
+  emp_err_role_required: "Position is required",
+  emp_err_dept_required: "Department is required",
+  save_error: "Could not save changes. Please try again.",
   // Products
   prod_title: "Products & Stock",
   prod_desc: "Monitor the prices and inventory of your products or services.",
@@ -88,8 +94,6 @@ const en = {
   status_out: "Out of Stock",
   // ThemeToggle
   aria_toggle_dark_mode: "Toggle dark mode",
-  // Footer
-  docs_button: "View Documentation",
   btn_cancel: "Cancel",
   btn_delete: "Delete",
   btn_saving: "Saving...",
@@ -181,6 +185,14 @@ const en = {
   work_in_progress: "We're still working on this section",
   work_in_progress_desc: "Come back soon for updates.",
   coming_soon: "Soon",
+  // Table controls
+  tbl_search: "Search…",
+  tbl_filter_all: "All statuses",
+  tbl_per_page: "Per page",
+  tbl_page_of: "Page {{page}} of {{count}}",
+  tbl_prev: "Previous",
+  tbl_next: "Next",
+  tbl_no_results: "No results",
 };
 
 const es = {
@@ -197,7 +209,6 @@ const es = {
   have_account: "¿Ya tenés cuenta?",
   invalid_credentials: "Credenciales incorrectas",
   invalid_email: "Ingresá un email válido",
-  loading_profile: "Cargando perfil...",
   logout: "Cerrar sesión",
   name_required: "El nombre es obligatorio",
   no_account: "¿No tenés cuenta?",
@@ -232,7 +243,10 @@ const es = {
   sidebar_overview: "Resumen",
   sidebar_employees: "Empleados",
   sidebar_products: "Productos",
-  greeting_user: "Hola, {{name}}",
+  // Navbar
+  navbar_docs: "Documentación",
+  navbar_my_account: "Mi cuenta",
+  navbar_user_menu_aria: "Menú de usuario",
   // Overview
   overview_title: "Resumen General",
   overview_desc: "Un vistazo rápido a las métricas principales de la empresa.",
@@ -254,6 +268,10 @@ const es = {
   status_inactive: "Inactivo",
   btn_save: "Guardar",
   emp_btn_edit: "Editar empleado",
+  emp_err_name_required: "El nombre es obligatorio",
+  emp_err_role_required: "El cargo es obligatorio",
+  emp_err_dept_required: "El departamento es obligatorio",
+  save_error: "No se pudieron guardar los cambios. Intentá de nuevo.",
   // Products
   prod_title: "Productos y Stock",
   prod_desc: "Monitoriza los precios y el inventario de tus productos o servicios.",
@@ -270,8 +288,6 @@ const es = {
   status_out: "Agotado",
   // ThemeToggle
   aria_toggle_dark_mode: "Alternar modo oscuro",
-  // Footer
-  docs_button: "Ver documentación",
   btn_cancel: "Cancelar",
   btn_delete: "Eliminar",
   btn_saving: "Guardando...",
@@ -363,6 +379,14 @@ const es = {
   work_in_progress: "Aún estamos trabajando en esta sección",
   work_in_progress_desc: "Volvé pronto para ver las novedades.",
   coming_soon: "Pronto",
+  // Table controls
+  tbl_search: "Buscar…",
+  tbl_filter_all: "Todos los estados",
+  tbl_per_page: "Por página",
+  tbl_page_of: "Página {{page}} de {{count}}",
+  tbl_prev: "Anterior",
+  tbl_next: "Siguiente",
+  tbl_no_results: "Sin resultados",
 };
 
 if (!i18n.isInitialized) {

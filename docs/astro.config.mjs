@@ -10,9 +10,6 @@ const base = process.env.DOCS_BASE ?? `/~${USUARIO}/docs`
 export default defineConfig({
   site: `http://200.3.127.46:8002/~${USUARIO}`,
   base,
-  legacy: {
-    collections: true,
-  },
   integrations: [
     starlight({
       title: 'SchujmanB2B',
@@ -31,7 +28,7 @@ export default defineConfig({
         {
           label: 'Entregas',
           translations: { en: 'Deliverables' },
-          autogenerate: { directory: 'entregas' },
+          items: [{ autogenerate: { directory: 'entregas' } }],
         },
       ],
     }),
