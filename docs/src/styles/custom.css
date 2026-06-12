@@ -1,64 +1,89 @@
-/* SchujmanB2B theme — matches the main app's blue palette */
+/* SchujmanB2B theme — mirrors the main app's "GymPro" OKLch palette (frontend/app/globals.css) */
+
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 
 :root {
-  --b2b-color: #FFD700;
+  /* App tokens (copied from frontend/app/globals.css) */
+  --shj-gold: oklch(0.75 0.15 85);
+  --shj-radius: 0.75rem;
+  --shj-sidebar: oklch(0.18 0.05 255);
+  --shj-sidebar-foreground: oklch(0.95 0.01 240);
+  --shj-sidebar-accent: oklch(0.2 0.03 240);
+  --shj-sidebar-border: oklch(0.25 0.03 240);
+  --shj-sidebar-primary: oklch(0.55 0.15 175);
+  --shj-sidebar-primary-foreground: oklch(0.99 0 0);
 
-  --sl-color-accent-low:  rgba(74, 144, 217, 0.2);
-  --sl-color-accent:      #1e50a0;
-  --sl-color-accent-high: #4a90d9;
+  /* Starlight palette — light mode */
+  --sl-color-accent-low:  oklch(0.55 0.15 175 / 0.12);
+  --sl-color-accent:      oklch(0.55 0.15 175);
+  --sl-color-accent-high: oklch(0.45 0.13 175);
 
-  --sl-color-white:       #1a3a6b;
-  --sl-color-gray-1:      #2e6db4;
-  --sl-color-gray-2:      #3a7ecf;
-  --sl-color-gray-3:      rgba(30, 80, 160, 0.55);
-  --sl-color-gray-4:      rgba(30, 80, 160, 0.20);
-  --sl-color-gray-5:      #dce8f5;
-  --sl-color-gray-6:      #eef4fb;
-  --sl-color-black:       #eef4fb;
+  --sl-color-white:       oklch(0.15 0.02 240);
+  --sl-color-gray-1:      oklch(0.25 0.02 240);
+  --sl-color-gray-2:      oklch(0.35 0.02 240);
+  --sl-color-gray-3:      oklch(0.5 0.02 240);
+  --sl-color-gray-4:      oklch(0.7 0.015 240);
+  --sl-color-gray-5:      oklch(0.9 0.01 240);
+  --sl-color-gray-6:      oklch(0.95 0.005 240);
+  --sl-color-black:       oklch(0.98 0.005 240);
 
-  --sl-color-bg:          #eef4fb;
-  --sl-color-bg-nav:      #ffffff;
-  --sl-color-bg-sidebar:  #dce8f5;
-  --sl-color-bg-inline-code: rgba(30, 80, 160, 0.08);
+  --sl-color-bg:          oklch(0.98 0.005 240);
+  --sl-color-bg-nav:      oklch(1 0 0);
+  --sl-color-bg-sidebar:  var(--shj-sidebar);
+  --sl-color-bg-inline-code: oklch(0.95 0.005 240);
 
-  --sl-color-hairline-light: rgba(30, 80, 160, 0.12);
-  --sl-color-hairline-shade: rgba(30, 80, 160, 0.08);
+  --sl-color-hairline-light: oklch(0.9 0.01 240);
+  --sl-color-hairline-shade: oklch(0.92 0.01 240);
 
-  --sl-color-text:        #1a3a6b;
-  --sl-color-text-accent: #2e6db4;
+  --sl-color-text:        oklch(0.15 0.02 240);
+  --sl-color-text-accent: oklch(0.45 0.13 175);
 
-  --sl-font: ui-sans-serif, system-ui, sans-serif;
+  --sl-font: 'Geist Variable', 'Geist', system-ui, sans-serif;
+  --sl-font-mono: 'Geist Mono Variable', 'Geist Mono', monospace;
   --sl-text-body-sm:      0.875rem;
 }
 
 [data-theme="dark"] {
-  --sl-color-accent-low:  rgba(74, 144, 217, 0.15);
-  --sl-color-accent:      #2e6db4;
-  --sl-color-accent-high: #4a90d9;
+  --shj-sidebar: oklch(0.16 0.06 255);
+  --shj-sidebar-accent: oklch(0.18 0.02 240);
+  --shj-sidebar-border: oklch(0.22 0.02 240);
+  --shj-sidebar-primary: oklch(0.65 0.15 175);
+  --shj-sidebar-primary-foreground: oklch(0.1 0.02 240);
 
-  --sl-color-white:       #ddeeff;
-  --sl-color-gray-1:      #7ab8f5;
-  --sl-color-gray-2:      #5a9de0;
-  --sl-color-gray-3:      rgba(221, 238, 255, 0.55);
-  --sl-color-gray-4:      rgba(74, 144, 217, 0.25);
-  --sl-color-gray-5:      #162540;
-  --sl-color-gray-6:      #0d1b2e;
-  --sl-color-black:       #0d1b2e;
+  --sl-color-accent-low:  oklch(0.65 0.15 175 / 0.15);
+  --sl-color-accent:      oklch(0.65 0.15 175);
+  --sl-color-accent-high: oklch(0.75 0.13 175);
 
-  --sl-color-bg:          #0d1b2e;
-  --sl-color-bg-nav:      #1a2e4a;
-  --sl-color-bg-sidebar:  #162540;
-  --sl-color-bg-inline-code: rgba(74, 144, 217, 0.12);
+  --sl-color-white:       oklch(0.95 0.01 240);
+  --sl-color-gray-1:      oklch(0.8 0.015 240);
+  --sl-color-gray-2:      oklch(0.65 0.02 240);
+  --sl-color-gray-3:      oklch(0.5 0.02 240);
+  --sl-color-gray-4:      oklch(0.3 0.02 240);
+  --sl-color-gray-5:      oklch(0.25 0.02 240);
+  --sl-color-gray-6:      oklch(0.22 0.02 240);
+  --sl-color-black:       oklch(0.12 0.02 240);
 
-  --sl-color-hairline-light: rgba(74, 144, 217, 0.2);
-  --sl-color-hairline-shade: rgba(74, 144, 217, 0.1);
+  --sl-color-bg:          oklch(0.12 0.02 240);
+  --sl-color-bg-nav:      oklch(0.16 0.02 240);
+  --sl-color-bg-sidebar:  var(--shj-sidebar);
+  --sl-color-bg-inline-code: oklch(0.22 0.02 240);
 
-  --sl-color-text:        #ddeeff;
-  --sl-color-text-accent: #7ab8f5;
+  --sl-color-hairline-light: oklch(0.25 0.02 240);
+  --sl-color-hairline-shade: oklch(0.22 0.02 240);
+
+  --sl-color-text:        oklch(0.95 0.01 240);
+  --sl-color-text-accent: oklch(0.75 0.13 175);
 }
 
-/* ===== HEADER RIGHT GROUP — pill container matching app's .lang-switcher ===== */
+/* ===== HEADER — matches the app's .app-navbar (card bg + bottom border) ===== */
 
+header.header {
+  background: var(--sl-color-bg-nav);
+  border-bottom: 1px solid var(--sl-color-hairline-light);
+}
+
+/* Right group — pill container matching the app's .lang-switcher */
 .right-group {
   display: flex;
   align-items: center;
@@ -66,8 +91,7 @@
   padding: 3px;
   background: var(--sl-color-bg-nav);
   border: 1px solid var(--sl-color-hairline-light);
-  border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border-radius: calc(var(--shj-radius) - 2px);
 }
 
 /* Lang buttons first, theme toggle last — matches the app's order */
@@ -75,45 +99,115 @@ starlight-lang-select,
 .lang-buttons { order: 1; }
 starlight-theme-toggle { order: 2; }
 
-/* Search button — consistent with the pill group */
+/* Search button — consistent with the app's bordered controls */
 site-search button[data-open-modal] {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 0.75rem;
-  border-radius: 8px;
+  border-radius: calc(var(--shj-radius) - 2px);
   border: 1px solid var(--sl-color-hairline-light);
   background: var(--sl-color-bg-nav);
-  color: var(--sl-color-gray-1);
+  color: var(--sl-color-gray-3);
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 site-search button[data-open-modal]:hover {
-  background: var(--sl-color-gray-5);
+  background: var(--sl-color-gray-6);
   color: var(--sl-color-white);
   border-color: var(--sl-color-accent);
 }
 
-/* ===== ACCENT LINKS AND HIGHLIGHTS ===== */
-/* Accent links and highlights */
-a {
-  color: var(--sl-color-accent-high);
+/* ===== SIDEBAR — dark like the app's .dashboard-sidebar (both themes) ===== */
+
+.sidebar-pane {
+  background-color: var(--shj-sidebar);
+  border-right: 1px solid var(--shj-sidebar-border);
 }
 
-/* Starlight site header */
-header.header {
-  border-bottom-color: var(--sl-color-hairline-light);
+/* Nav links — like the app's .nav-item */
+.sidebar-content a {
+  color: var(--shj-sidebar-foreground);
+  opacity: 0.7;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: calc(var(--shj-radius) - 2px);
+  transition: all 0.2s ease;
+}
+
+.sidebar-content a:hover {
+  background: var(--shj-sidebar-accent);
+  color: var(--shj-sidebar-foreground);
+  opacity: 1;
+}
+
+.sidebar-content a[aria-current="page"] {
+  background: var(--shj-sidebar-primary);
+  color: var(--shj-sidebar-primary-foreground);
+  opacity: 1;
+}
+
+.sidebar-content a[aria-current="page"]:hover {
+  background: var(--shj-sidebar-primary);
+  color: var(--shj-sidebar-primary-foreground);
+}
+
+/* Group labels — like the app's .sidebar-section-label */
+.sidebar-content .group-label span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--shj-sidebar-foreground);
+  opacity: 0.4;
+}
+
+.sidebar-content summary {
+  color: var(--shj-sidebar-foreground);
+}
+
+.sidebar-content .caret {
+  color: var(--shj-sidebar-foreground);
+  opacity: 0.6;
+}
+
+/* Mobile menu toggle keeps header colors, not sidebar ones */
+starlight-menu-button button {
   background: var(--sl-color-bg-nav);
+  color: var(--sl-color-gray-1);
+  border: 1px solid var(--sl-color-hairline-light);
+  box-shadow: none;
 }
 
-/* Sidebar active item */
-.sidebar-content a[aria-current="page"],
-nav a[aria-current="page"] {
-  background: rgba(74, 144, 217, 0.12);
-  color: var(--sl-color-accent-high);
-  border-radius: 6px;
+/* ===== CONTENT ===== */
+
+/* Accent links */
+.sl-markdown-content a {
+  color: var(--sl-color-text-accent);
+}
+
+/* Inline code — muted bg like the app */
+.sl-markdown-content code:not(pre code) {
+  border-radius: calc(var(--shj-radius) - 6px);
+}
+
+/* Tables — header like the app's .data-table */
+.sl-markdown-content th {
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-gray-3);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.sl-markdown-content td {
+  font-size: 0.875rem;
+}
+
+/* Asides / cards — app radius */
+.sl-markdown-content .starlight-aside,
+.card {
+  border-radius: var(--shj-radius);
 }
