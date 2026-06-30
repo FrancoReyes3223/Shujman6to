@@ -69,6 +69,31 @@ export const workspacesService = {
     })
   },
 
+  /** Elimina un workspace por completo — solo OWNER (cascada borra members, employees, products, company) */
+  async delete(userId: string, workspaceId: string) {
+    await this.requireRole(userId, workspaceId, WorkspaceRole.OWNER)
+    return prisma.workspace.delete({ where: { id: workspaceId } })
+  },
+
+  /** El usuario actual abandona el workspace (no aplica al único OWNER) */
+  async leave(userId: string, workspaceId: string) {
+    const membership = await prisma.workspaceMember.findUnique({
+      where: { userId_workspaceId: { userId, workspaceId } },
+    })
+    if (!membership) throw new Error('No eres miembro de este workspace')
+    if (membership.role === WorkspaceRole.OWNER) {
+      const owners = await prisma.workspaceMember.count({
+        where: { workspaceId, role: WorkspaceRole.OWNER },
+      })
+      if (owners <= 1) {
+        throw new Error('El owner no puede abandonar el workspace; transferí la propiedad o eliminá el workspace')
+      }
+    }
+    return prisma.workspaceMember.delete({
+      where: { userId_workspaceId: { userId, workspaceId } },
+    })
+  },
+
   /** Agrega un miembro por email — solo OWNER */
   async addMember(userId: string, workspaceId: string, email: string, role: WorkspaceRole) {
     await this.requireRole(userId, workspaceId, WorkspaceRole.OWNER)

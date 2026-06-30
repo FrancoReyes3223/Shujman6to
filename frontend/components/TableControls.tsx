@@ -7,7 +7,14 @@ const SearchIcon = () => (
   </svg>
 );
 
+const DownloadIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" />
+  </svg>
+);
+
 export type StatusOption = { value: string; label: string };
+export type SearchColumnOption = { value: string; label: string };
 
 export function TableToolbar({
   query,
@@ -15,12 +22,20 @@ export function TableToolbar({
   statusFilter,
   onStatusChange,
   statusOptions,
+  searchColumn,
+  onSearchColumnChange,
+  searchColumnOptions,
+  onExport,
 }: {
   query: string;
   onQueryChange: (value: string) => void;
   statusFilter: string;
   onStatusChange: (value: string) => void;
   statusOptions: StatusOption[];
+  searchColumn?: string;
+  onSearchColumnChange?: (value: string) => void;
+  searchColumnOptions?: SearchColumnOption[];
+  onExport?: () => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -46,6 +61,20 @@ export function TableToolbar({
           style={{ paddingLeft: "2.25rem", margin: 0 }}
         />
       </div>
+      {searchColumnOptions && searchColumnOptions.length > 0 && (
+        <select
+          className="form-input"
+          value={searchColumn}
+          onChange={e => onSearchColumnChange?.(e.target.value)}
+          style={{ width: "auto", minWidth: "150px", margin: 0 }}
+          title={t("tbl_search_in", "Search in")}
+        >
+          <option value="all">{t("tbl_search_all_columns", "All columns")}</option>
+          {searchColumnOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      )}
       <select
         className="form-input"
         value={statusFilter}
@@ -57,6 +86,17 @@ export function TableToolbar({
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
+      {onExport && (
+        <button
+          className="btn-primary"
+          onClick={onExport}
+          style={{ width: "auto", margin: 0, marginLeft: "auto", padding: "0.5rem 1rem", display: "flex", alignItems: "center", gap: "0.4rem" }}
+          title={t("tbl_export_csv", "Export CSV")}
+        >
+          <DownloadIcon />
+          {t("tbl_export_csv", "Export CSV")}
+        </button>
+      )}
     </div>
   );
 }

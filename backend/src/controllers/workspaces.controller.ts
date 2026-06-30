@@ -52,6 +52,28 @@ export const workspacesController = {
     }
   },
 
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id: userId } = (req as AuthRequest).user
+      const { id: workspaceId } = req.params
+      await workspacesService.delete(userId, workspaceId)
+      res.json({ success: true, message: 'Workspace eliminado' })
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async leave(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id: userId } = (req as AuthRequest).user
+      const { id: workspaceId } = req.params
+      await workspacesService.leave(userId, workspaceId)
+      res.json({ success: true, message: 'Abandonaste el workspace' })
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async addMember(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = (req as AuthRequest).user

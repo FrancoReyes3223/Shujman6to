@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useUser } from "../lib/UserContext";
 import { useWorkspace } from "../lib/WorkspaceContext";
+import { MEDIA_BASE } from "../lib/api";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 const ROLE_COLORS: Record<string, string> = {
@@ -115,7 +116,11 @@ export default function Navbar() {
               aria-label={t("navbar_user_menu_aria", "User menu")}
               aria-expanded={menuOpen}
             >
-              <span className="user-avatar">{getInitials(user.fullName)}</span>
+              <span className="user-avatar">
+                {user.photoUrl
+                  ? <img src={`${MEDIA_BASE}${user.photoUrl}`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }} />
+                  : getInitials(user.fullName)}
+              </span>
               <span className="user-menu-name">{user.fullName}</span>
               {Icons.chevronDown}
             </button>

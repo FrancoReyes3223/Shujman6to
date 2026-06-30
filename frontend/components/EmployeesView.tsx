@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { API_BASE } from "../lib/api";
 import { useTableControls } from "../lib/useTableControls";
 import { TableToolbar, TablePagination, SortHeader } from "./TableControls";
+import { exportCsv } from "../lib/exportCsv";
+import ImportModal from "./ImportModal";
 
 export type Employee = { id: string; name: string; role: string; department: string; status: string };
 
@@ -178,9 +180,23 @@ export default function EmployeesView({
     { value: "Inactive", label: t("status_inactive", "Inactive") },
   ];
 
+  const searchColumnOptions = [
+    { value: "name", label: t("emp_col_name", "Name") },
+    { value: "role", label: t("emp_col_role", "Role") },
+    { value: "department", label: t("emp_col_dept", "Department") },
+  ];
+
+  const csvColumns: { key: keyof Employee; label: string }[] = [
+    { key: "name", label: t("emp_col_name", "Name") },
+    { key: "role", label: t("emp_col_role", "Role") },
+    { key: "department", label: t("emp_col_dept", "Department") },
+    { key: "status", label: t("emp_col_status", "Status") },
+  ];
+
   const [addForm, setAddForm] = useState<EmpForm>(EMPTY_EMP);
   const [showAddModal, setShowAddModal] = useState(false);
   const [addError, setAddError] = useState("");
+  const [showImport, setShowImport] = useState(false);
 
   const [editTarget, setEditTarget] = useState<Employee | null>(null);
   const [editForm, setEditForm] = useState<EmpForm>(EMPTY_EMP);
@@ -266,9 +282,14 @@ export default function EmployeesView({
         <div className="table-header">
           <h2>{t("emp_list_title", "Staff List")}</h2>
           {!readOnly && (
-            <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
-              {t("emp_btn_new", "+ New Employee")}
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button className="btn-primary" onClick={() => setShowImport(true)} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem', background: 'transparent', color: 'var(--accent)', border: '1px solid var(--accent)', boxShadow: 'none' }}>
+                {t("import_btn", "Import")}
+              </button>
+              <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
+                {t("emp_btn_new", "+ New Employee")}
+              </button>
+            </div>
           )}
         </div>
         <TableToolbar
@@ -277,6 +298,10 @@ export default function EmployeesView({
           statusFilter={table.statusFilter}
           onStatusChange={table.setStatusFilter}
           statusOptions={statusOptions}
+          searchColumn={table.searchColumn as string}
+          onSearchColumnChange={table.setSearchColumn}
+          searchColumnOptions={searchColumnOptions}
+          onExport={() => exportCsv("employees.csv", csvColumns, table.rows)}
         />
         <table className="data-table">
           <thead>
@@ -351,6 +376,18 @@ export default function EmployeesView({
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAddSubmit}
           serverError={addError}
+        />
+      )}
+
+      {showImport && (
+        <ImportModal<Employee>
+          title={t("import_title_emp", "Import employees")}
+          endpoint={`/workspaces/${workspaceId}/employees/import`}
+          token={token}
+          templateColumns={csvColumns}
+          templateFilename="employees-template.csv"
+          onImported={(created) => setEmployees([...created, ...employees])}
+          onClose={() => setShowImport(false)}
         />
       )}
 

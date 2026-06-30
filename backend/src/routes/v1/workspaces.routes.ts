@@ -12,6 +12,8 @@ router.post('/', workspacesController.create)
 router.get('/', workspacesController.list)
 router.get('/:id', workspacesController.getById)
 router.patch('/:id', workspacesController.update)
+router.delete('/:id', workspacesController.delete)
+router.delete('/:id/leave', workspacesController.leave)
 
 // Gestión de miembros
 router.post('/:id/members', workspacesController.addMember)

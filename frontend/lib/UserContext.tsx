@@ -13,6 +13,7 @@ import { API_BASE } from "./api";
 export type User = {
   fullName: string;
   email: string;
+  photoUrl?: string | null;
 };
 
 type UserContextType = {
