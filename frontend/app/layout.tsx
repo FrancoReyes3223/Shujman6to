@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { cookies } from "next/headers";
 import "./globals.css";
 import I18nProvider from "../components/I18nProvider";
 import Navbar from "../components/Navbar";
@@ -23,17 +22,17 @@ export const metadata: Metadata = {
   description: "Sistema de gestión B2B",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Resolve the language from the cookie on the server so SSR renders in the
-  // same language the client will, avoiding hydration mismatches.
-  const lang = (await cookies()).get("i18next")?.value === "en" ? "en" : "es";
+  // This is a static export (no per-request server), so the language can only
+  // be resolved client-side from the cookie. Default to "es" here to match
+  // i18n's initial state and avoid hydration mismatches.
   return (
     <html
-      lang={lang}
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
@@ -53,7 +52,7 @@ export default async function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <I18nProvider initialLang={lang}>
+          <I18nProvider initialLang="es">
             <UserProvider>
               <WorkspaceProvider>
                 <Navbar />
