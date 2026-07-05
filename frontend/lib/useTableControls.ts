@@ -27,6 +27,7 @@ export function useTableControls<T extends Record<string, unknown>>(
   { searchFields, statusField, numericFields = [] }: Options<T>,
 ) {
   const [query, setQuery] = useState("");
+  const [searchColumn, setSearchColumnRaw] = useState<keyof T | "all">("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<keyof T | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
@@ -49,6 +50,11 @@ export function useTableControls<T extends Record<string, unknown>>(
     setPage(1);
   };
 
+  const setSearchColumn = (value: string) => {
+    setSearchColumnRaw(value as keyof T | "all");
+    setPage(1);
+  };
+
   const setStatus = (value: string) => {
     setStatusFilter(value);
     setPage(1);
@@ -61,10 +67,12 @@ export function useTableControls<T extends Record<string, unknown>>(
 
   const filteredSorted = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const fieldsToSearch =
+      searchColumn === "all" ? searchFields : [searchColumn];
     let result = items.filter(item => {
       const matchesQuery =
         q === "" ||
-        searchFields.some(f =>
+        fieldsToSearch.some(f =>
           String(item[f] ?? "").toLowerCase().includes(q),
         );
       const matchesStatus =
@@ -90,7 +98,7 @@ export function useTableControls<T extends Record<string, unknown>>(
     }
 
     return result;
-  }, [items, query, statusFilter, sortKey, sortDir, searchFields, statusField, numericFields]);
+  }, [items, query, searchColumn, statusFilter, sortKey, sortDir, searchFields, statusField, numericFields]);
 
   const total = filteredSorted.length;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
@@ -103,6 +111,8 @@ export function useTableControls<T extends Record<string, unknown>>(
   return {
     query,
     setQuery: setSearch,
+    searchColumn,
+    setSearchColumn,
     statusFilter,
     setStatusFilter: setStatus,
     sortKey,
@@ -115,5 +125,6 @@ export function useTableControls<T extends Record<string, unknown>>(
     pageCount,
     total,
     paged,
+    rows: filteredSorted,
   };
 }

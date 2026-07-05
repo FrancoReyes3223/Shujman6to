@@ -50,12 +50,11 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }: 
 
   const accountItems = [
     { id: "cuenta",     label: t("sidebar_account",    "Account"),    icon: Icons.account,    comingSoon: false },
-    { id: "seguridad",  label: t("sidebar_security",   "Security"),   icon: Icons.security,   comingSoon: true  },
+    { id: "seguridad",  label: t("sidebar_security",   "Security"),   icon: Icons.security,   comingSoon: false },
     { id: "workspaces", label: t("sidebar_workspaces", "Workspaces"), icon: Icons.workspaces, comingSoon: false },
   ];
 
   const workspaceItems = [
-    { id: "ws-profile",  label: t("sidebar_my_profile", "My Profile"), icon: Icons.profile,  comingSoon: true  },
     { id: "ws-company",  label: t("sidebar_company",    "Company"),    icon: Icons.company,   comingSoon: false },
     { id: "ws-members",  label: t("sidebar_members",    "Members"),    icon: Icons.members,   comingSoon: false },
     { id: "overview",    label: t("sidebar_overview",   "Overview"),   icon: Icons.overview,  comingSoon: false },

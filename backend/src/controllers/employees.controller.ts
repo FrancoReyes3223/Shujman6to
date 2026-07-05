@@ -1,9 +1,26 @@
 import { Request, Response, NextFunction } from 'express'
 import { employeesService } from '../services/employees.service'
+import { parseSheet } from '../utils/sheetParser'
 
 type AuthRequest = Request & { user: { id: string; email: string } }
 
 export const employeesController = {
+  async importFile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id: userId } = (req as AuthRequest).user
+      const { workspaceId } = req.params
+      if (!req.file) return res.status(400).json({ success: false, message: 'No se recibió ningún archivo' })
+      const { rows, sheetNames } = parseSheet(req.file.buffer)
+      const report = await employeesService.importRows(userId, workspaceId, rows)
+      if (sheetNames.length > 1) {
+        report.warnings.push(`El archivo tiene ${sheetNames.length} hojas; solo se importó la primera ("${sheetNames[0]}").`)
+      }
+      res.json({ success: true, data: report })
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = (req as AuthRequest).user

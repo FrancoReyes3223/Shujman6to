@@ -13,7 +13,7 @@ export const usuarioRepository = {
     return await prisma.user.findUnique({ where: { id } })
   },
 
-  async update(id: string, data: Partial<{ email: string; password: string; fullName: string }>) {
+  async update(id: string, data: Partial<{ email: string; password: string; fullName: string; photoUrl: string }>) {
     return await prisma.user.update({ where: { id }, data })
   },
 

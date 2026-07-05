@@ -13,11 +13,12 @@ import ProductsView from "../../components/ProductsView";
 import type { Employee } from "../../components/EmployeesView";
 import type { Product } from "../../components/ProductsView";
 import AccountView from "../../components/AccountView";
+import SecurityView from "../../components/SecurityView";
 import CompanyView from "../../components/CompanyView";
 import WorkspaceMembersView from "../../components/WorkspaceMembersView";
 import WorkspacesView from "../../components/WorkspacesView";
 
-const VALID_TABS = ["overview", "employees", "products", "cuenta", "ws-company", "ws-members", "workspaces"];
+const VALID_TABS = ["overview", "employees", "products", "cuenta", "seguridad", "ws-company", "ws-members", "workspaces"];
 
 // Inner component that uses the workspace and user contexts
 function DashboardInner() {
@@ -112,7 +113,10 @@ function DashboardInner() {
           <ProductsView products={products} setProducts={setProducts} readOnly={readOnly} workspaceId={wsKey} token={token} />
         </div>
         <div style={{ display: activeTab === "cuenta" ? "block" : "none" }}>
-          <AccountView user={user} />
+          <AccountView user={user} token={token} />
+        </div>
+        <div style={{ display: activeTab === "seguridad" ? "block" : "none" }}>
+          <SecurityView token={token} />
         </div>
         <div style={{ display: activeTab === "ws-company" ? "block" : "none" }}>
           <CompanyView workspaceId={wsKey} token={token} readOnly={activeWorkspace?.role !== "OWNER"} />

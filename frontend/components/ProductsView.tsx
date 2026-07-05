@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { API_BASE } from "../lib/api";
 import { useTableControls } from "../lib/useTableControls";
 import { TableToolbar, TablePagination, SortHeader } from "./TableControls";
+import { exportCsv } from "../lib/exportCsv";
+import ImportModal from "./ImportModal";
 
 export type Product = { id: string; name: string; category: string; price: string; stock: string; status: string };
 
@@ -32,20 +34,46 @@ function normalizePrice(price: string) {
   return price && !price.startsWith('$') ? '$' + price : price;
 }
 
+const fieldErrorStyle = { color: 'var(--error)', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' };
+
+/** Valida precio (opcional, número >= 0, admite $ y miles) y stock (entero >= 0). */
+function validatePriceClient(raw: string): boolean {
+  if (!raw.trim()) return true;
+  const cleaned = raw.replace(/[$\s,]/g, "");
+  const num = Number(cleaned);
+  return Number.isFinite(num) && num >= 0;
+}
+function validateStockClient(raw: string): boolean {
+  if (!raw.trim()) return true;
+  return /^\d+$/.test(raw.replace(/[\s,]/g, ""));
+}
+
 function ProdModal({
   title,
   form,
   onChange,
   onClose,
   onSubmit,
+  serverError,
 }: {
   title: string;
   form: ProdForm;
   onChange: (f: ProdForm) => void;
   onClose: () => void;
   onSubmit: () => void;
+  serverError?: string;
 }) {
   const { t } = useTranslation();
+  const [errors, setErrors] = useState<{ price?: string; stock?: string }>({});
+
+  const handleSave = () => {
+    const next: { price?: string; stock?: string } = {};
+    if (!validatePriceClient(form.price)) next.price = t("prod_err_price", "Price must be a number ≥ 0");
+    if (!validateStockClient(form.stock)) next.stock = t("prod_err_stock", "Stock must be a whole number ≥ 0");
+    if (Object.keys(next).length > 0) { setErrors(next); return; }
+    onSubmit();
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -54,6 +82,11 @@ function ProdModal({
           <button className="btn-close" onClick={onClose}><CloseIcon /></button>
         </div>
         <div className="modal-body">
+          {serverError && (
+            <div style={{ background: 'var(--error-bg, rgba(220,38,38,0.1))', color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '0.5rem', padding: '0.6rem 0.85rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+              {serverError}
+            </div>
+          )}
           <div className="form-group">
             <label>{t("prod_col_name", "Product/Service Name")}</label>
             <input
@@ -78,18 +111,22 @@ function ProdModal({
             <input
               className="form-input"
               value={form.price}
-              onChange={e => onChange({ ...form, price: e.target.value })}
+              onChange={e => { onChange({ ...form, price: e.target.value }); setErrors(p => ({ ...p, price: undefined })); }}
               placeholder="$0.00"
+              style={errors.price ? { borderColor: 'var(--error)' } : undefined}
             />
+            {errors.price && <span style={fieldErrorStyle}>{errors.price}</span>}
           </div>
           <div className="form-group">
             <label>{t("prod_col_stock", "Stock")}</label>
             <input
               className="form-input"
               value={form.stock}
-              onChange={e => onChange({ ...form, stock: e.target.value })}
+              onChange={e => { onChange({ ...form, stock: e.target.value }); setErrors(p => ({ ...p, stock: undefined })); }}
               placeholder={t("prod_col_stock", "Stock")}
+              style={errors.stock ? { borderColor: 'var(--error)' } : undefined}
             />
+            {errors.stock && <span style={fieldErrorStyle}>{errors.stock}</span>}
           </div>
           <div className="form-group">
             <label>{t("prod_col_status", "Status")}</label>
@@ -115,7 +152,7 @@ function ProdModal({
           <button
             className="btn-primary"
             style={{ width: 'auto', margin: 0, padding: '0.5rem 1.25rem' }}
-            onClick={onSubmit}
+            onClick={handleSave}
             disabled={!form.name.trim()}
           >
             {t("btn_save", "Save")}
@@ -153,46 +190,74 @@ export default function ProductsView({
     { value: "Out of Stock", label: t("status_out", "Out of Stock") },
   ];
 
+  const searchColumnOptions = [
+    { value: "name", label: t("prod_col_name", "Product/Service Name") },
+    { value: "category", label: t("prod_col_category", "Category") },
+  ];
+
+  const csvColumns: { key: keyof Product; label: string }[] = [
+    { key: "name", label: t("prod_col_name", "Product/Service Name") },
+    { key: "category", label: t("prod_col_category", "Category") },
+    { key: "price", label: t("prod_col_price", "Price") },
+    { key: "stock", label: t("prod_col_stock", "Stock") },
+    { key: "status", label: t("prod_col_status", "Status") },
+  ];
+
   const [addForm, setAddForm] = useState<ProdForm>(EMPTY_PROD);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [showImport, setShowImport] = useState(false);
 
   const [editTarget, setEditTarget] = useState<Product | null>(null);
   const [editForm, setEditForm] = useState<ProdForm>(EMPTY_PROD);
+  const [editError, setEditError] = useState("");
 
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
   const handleAddNew = () => {
     setAddForm(EMPTY_PROD);
+    setAddError("");
     setShowAddModal(true);
   };
 
   const handleAddSubmit = async () => {
     if (!addForm.name.trim()) return;
-    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/products`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...addForm, price: normalizePrice(addForm.price) }),
-    });
-    const data = await res.json();
-    if (data.success) setProducts([data.data, ...products]);
-    setShowAddModal(false);
+    setAddError("");
+    try {
+      const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/products`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ...addForm, price: normalizePrice(addForm.price) }),
+      });
+      const data = await res.json();
+      if (data.success) { setProducts([data.data, ...products]); setShowAddModal(false); }
+      else setAddError(data.message || t("save_error", "Could not save changes. Please try again."));
+    } catch {
+      setAddError(t("server_connection_error", "Could not connect to the server"));
+    }
   };
 
   const handleEditClick = (prod: Product) => {
     setEditTarget(prod);
+    setEditError("");
     setEditForm({ name: prod.name, category: prod.category, price: prod.price, stock: prod.stock, status: prod.status });
   };
 
   const handleEditSubmit = async () => {
     if (!editTarget || !editForm.name.trim()) return;
-    const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/products/${editTarget.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...editForm, price: normalizePrice(editForm.price) }),
-    });
-    const data = await res.json();
-    if (data.success) setProducts(products.map(p => p.id === editTarget.id ? data.data : p));
-    setEditTarget(null);
+    setEditError("");
+    try {
+      const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/products/${editTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ...editForm, price: normalizePrice(editForm.price) }),
+      });
+      const data = await res.json();
+      if (data.success) { setProducts(products.map(p => p.id === editTarget.id ? data.data : p)); setEditTarget(null); }
+      else setEditError(data.message || t("save_error", "Could not save changes. Please try again."));
+    } catch {
+      setEditError(t("server_connection_error", "Could not connect to the server"));
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -220,9 +285,14 @@ export default function ProductsView({
         <div className="table-header">
           <h2>{t("prod_list_title", "Current Inventory")}</h2>
           {!readOnly && (
-            <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
-              {t("prod_btn_new", "+ New Product")}
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button className="btn-primary" onClick={() => setShowImport(true)} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem', background: 'transparent', color: 'var(--accent)', border: '1px solid var(--accent)', boxShadow: 'none' }}>
+                {t("import_btn", "Import")}
+              </button>
+              <button className="btn-primary" onClick={handleAddNew} style={{ width: 'auto', margin: 0, padding: '0.5rem 1rem' }}>
+                {t("prod_btn_new", "+ New Product")}
+              </button>
+            </div>
           )}
         </div>
         <TableToolbar
@@ -231,6 +301,10 @@ export default function ProductsView({
           statusFilter={table.statusFilter}
           onStatusChange={table.setStatusFilter}
           statusOptions={statusOptions}
+          searchColumn={table.searchColumn as string}
+          onSearchColumnChange={table.setSearchColumn}
+          searchColumnOptions={searchColumnOptions}
+          onExport={() => exportCsv("products.csv", csvColumns, table.rows)}
         />
         <table className="data-table">
           <thead>
@@ -306,6 +380,19 @@ export default function ProductsView({
           onChange={setAddForm}
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAddSubmit}
+          serverError={addError}
+        />
+      )}
+
+      {showImport && (
+        <ImportModal<Product>
+          title={t("import_title_prod", "Import products")}
+          endpoint={`/workspaces/${workspaceId}/products/import`}
+          token={token}
+          templateColumns={csvColumns}
+          templateFilename="products-template.csv"
+          onImported={(created) => setProducts([...created, ...products])}
+          onClose={() => setShowImport(false)}
         />
       )}
 
@@ -316,6 +403,7 @@ export default function ProductsView({
           onChange={setEditForm}
           onClose={() => setEditTarget(null)}
           onSubmit={handleEditSubmit}
+          serverError={editError}
         />
       )}
 

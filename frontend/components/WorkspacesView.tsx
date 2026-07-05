@@ -2,8 +2,16 @@
 
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../lib/api";
 import { useWorkspace, Workspace } from "../lib/WorkspaceContext";
 import WorkspaceCreateModal from "./WorkspaceCreateModal";
+import WorkspaceDeleteModal from "./WorkspaceDeleteModal";
+
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+  </svg>
+);
 
 const ROLE_COLORS: Record<string, string> = { OWNER: "#f59e0b", ADMIN: "#6366f1", USER: "#10b981" };
 
@@ -11,10 +19,14 @@ function WorkspaceCard({
   ws,
   isActive,
   onSelect,
+  onDelete,
+  onLeave,
 }: {
   ws: Workspace;
   isActive: boolean;
   onSelect: (ws: Workspace) => void;
+  onDelete: (ws: Workspace) => void;
+  onLeave: (ws: Workspace) => void;
 }) {
   const { t } = useTranslation();
   const roleLabels: Record<string, string> = {
@@ -136,6 +148,77 @@ function WorkspaceCard({
         )}
       </div>
 
+      {/* Delete (solo OWNER) */}
+      {ws.role === "OWNER" && (
+        <button
+          title={t("ws_delete_btn", "Delete workspace")}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(ws);
+          }}
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "2rem",
+            height: "2rem",
+            borderRadius: "0.5rem",
+            border: "1px solid var(--border-color)",
+            background: "transparent",
+            color: "var(--error)",
+            cursor: "pointer",
+            transition: "background 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(220,38,38,0.1)";
+            e.currentTarget.style.borderColor = "var(--error)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.borderColor = "var(--border-color)";
+          }}
+        >
+          <TrashIcon />
+        </button>
+      )}
+
+      {/* Leave (no-OWNER) */}
+      {ws.role !== "OWNER" && (
+        <button
+          title={t("ws_leave_btn", "Leave")}
+          onClick={(e) => {
+            e.stopPropagation();
+            onLeave(ws);
+          }}
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "0.35rem",
+            padding: "0.4rem 0.75rem",
+            borderRadius: "0.5rem",
+            border: "1px solid var(--border-color)",
+            background: "transparent",
+            color: "var(--error)",
+            fontSize: "0.8rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "background 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(220,38,38,0.1)";
+            e.currentTarget.style.borderColor = "var(--error)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.borderColor = "var(--border-color)";
+          }}
+        >
+          {t("ws_leave_btn", "Leave")}
+        </button>
+      )}
+
       {/* Active indicator */}
       {isActive && (
         <div style={{ flexShrink: 0 }}>
@@ -160,10 +243,22 @@ function WorkspaceCard({
   );
 }
 
+function getToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; token=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() ?? null;
+  return null;
+}
+
 export default function WorkspacesView() {
   const { t } = useTranslation();
-  const { workspaces, activeWorkspace, setActiveWorkspace, isLoading } = useWorkspace();
+  const { workspaces, activeWorkspace, setActiveWorkspace, isLoading, refreshWorkspaces } = useWorkspace();
   const [showCreate, setShowCreate] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Workspace | null>(null);
+  const [leaveTarget, setLeaveTarget] = useState<Workspace | null>(null);
+  const [leaveLoading, setLeaveLoading] = useState(false);
+  const [leaveError, setLeaveError] = useState("");
   const [justSwitched, setJustSwitched] = useState<string | null>(null);
 
   const roleLabels: Record<string, string> = {
@@ -181,6 +276,27 @@ export default function WorkspacesView() {
     setActiveWorkspace(ws);
     setJustSwitched(ws.id);
     setTimeout(() => setJustSwitched(null), 2000);
+  }
+
+  async function handleConfirmLeave() {
+    if (!leaveTarget) return;
+    setLeaveLoading(true);
+    setLeaveError("");
+    try {
+      const token = getToken();
+      const res = await fetch(`${API_BASE}/workspaces/${leaveTarget.id}/leave`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message ?? "Error al abandonar el workspace");
+      await refreshWorkspaces();
+      setLeaveTarget(null);
+    } catch (e: unknown) {
+      setLeaveError(e instanceof Error ? e.message : "Error inesperado");
+    } finally {
+      setLeaveLoading(false);
+    }
   }
 
   return (
@@ -229,7 +345,8 @@ export default function WorkspacesView() {
             <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
               {t("current_workspace", "Workspace activo")}
             </p>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
               <div
                 style={{
                   width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem",
@@ -254,6 +371,27 @@ export default function WorkspacesView() {
                   {roleLabels[activeWorkspace.role]}
                 </span>
               </div>
+              </div>
+              {activeWorkspace.role === "OWNER" && (
+                <button
+                  className="btn-primary"
+                  style={{
+                    background: "var(--error)",
+                    boxShadow: "none",
+                    width: "auto",
+                    margin: 0,
+                    padding: "0.5rem 1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    flexShrink: 0,
+                  }}
+                  onClick={() => setDeleteTarget(activeWorkspace)}
+                >
+                  <TrashIcon />
+                  {t("ws_delete_btn", "Delete workspace")}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -313,6 +451,8 @@ export default function WorkspacesView() {
                   ws={ws}
                   isActive={activeWorkspace?.id === ws.id}
                   onSelect={handleSelect}
+                  onDelete={setDeleteTarget}
+                  onLeave={(w) => { setLeaveError(""); setLeaveTarget(w); }}
                 />
               ))}
             </div>
@@ -345,6 +485,42 @@ export default function WorkspacesView() {
       </div>
 
       {showCreate && <WorkspaceCreateModal onClose={() => setShowCreate(false)} />}
+      {deleteTarget && (
+        <WorkspaceDeleteModal workspace={deleteTarget} onClose={() => setDeleteTarget(null)} />
+      )}
+      {leaveTarget && (
+        <div className="modal-overlay" onClick={() => !leaveLoading && setLeaveTarget(null)}>
+          <div className="modal-content" style={{ maxWidth: "440px" }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{t("ws_leave_btn", "Leave")}</h2>
+            </div>
+            <div className="modal-body">
+              <p style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                {t("ws_leave_confirm", "Are you sure you want to leave")} <strong style={{ color: "var(--foreground)" }}>{leaveTarget.name}</strong>?
+              </p>
+              {leaveError && <p style={{ color: "var(--error)", fontSize: "0.875rem", marginTop: "0.75rem" }}>{leaveError}</p>}
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-primary"
+                style={{ background: "transparent", color: "var(--text-secondary)", border: "1px solid var(--border-color)", width: "auto", margin: 0, padding: "0.5rem 1.25rem" }}
+                onClick={() => setLeaveTarget(null)}
+                disabled={leaveLoading}
+              >
+                {t("btn_cancel", "Cancel")}
+              </button>
+              <button
+                className="btn-primary"
+                style={{ background: "var(--error)", boxShadow: "none", width: "auto", margin: 0, padding: "0.5rem 1.25rem", opacity: leaveLoading ? 0.6 : 1 }}
+                onClick={handleConfirmLeave}
+                disabled={leaveLoading}
+              >
+                {leaveLoading ? t("loading", "Loading...") : t("ws_leave_btn", "Leave")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
